@@ -10,14 +10,14 @@ st.set_page_config(page_title="H32 QUANTUM TERMINAL", layout="wide", page_icon="
 st.markdown("""
 <style>
     .main {background-color: #000000; color: #00ffcc; font-family: 'Courier New', monospace;}
-    th {color: #00ffcc !important; background: #111111;}
-    .sell-alert {background-color: #2a0000; color: #ff3366; padding: 10px; border-radius: 8px;}
-    .buy-signal {background-color: #001a00; color: #00ff88; padding: 10px; border-radius: 8px;}
+    th {color: #00ffcc !important; background: #111111; text-transform: uppercase;}
+    .strong-buy {color: #00ff88; font-weight: bold;}
+    .urgent-sell {color: #ff3366; font-weight: bold;}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🔱 H32 QUANTUM TERMINAL — V10.1")
-st.caption("⚡ Clean • Only 2 Important Sections • Fast")
+st.title("🔱 H32 QUANTUM TERMINAL — V10.2")
+st.caption("⚡ Clean • Fast • Pro TradingView Style Analysis")
 
 SYMBOLS = ['BTC','ETH','SOL','BNB','XRP','ADA','DOGE','SHIB','DOT','LINK','UNI','LTC','AVAX','SUI','ONDO','HYPE','BGB','ZEC','XPL','BONE']
 
@@ -29,7 +29,7 @@ def get_data():
             return {item['symbol'].replace('USDT',''): item for item in r.json() if item['symbol'].endswith('USDT')}
     except:
         pass
-    return None
+    return {}
 
 placeholder = st.empty()
 
@@ -38,8 +38,8 @@ while True:
         data = get_data() or {}
         
         rows = []
-        urgent_sell = []
         strong_buy = []
+        urgent_sell = []
         
         for sym in SYMBOLS:
             if sym in data:
@@ -49,57 +49,55 @@ while True:
                 price = float(d['lastPrice'])
                 
                 liq = min(98, int(vol / 8000000))
-                conf = max(40, min(96, int(45 + chg*4.8 + vol/13000000 + liq/3)))
+                conf = max(42, min(96, int(48 + chg*4.5 + vol/12000000 + liq/3)))
                 
-                if chg <= -6:
+                if chg <= -6.5:
                     action = "🔴 URGENT SELL"
                     outlook = "Strong Down Pressure"
                     urgent_sell.append(f"**{sym}** → Urgent Sell ({chg:+.2f}%)")
-                elif conf >= 85 and chg > 2.5:
+                elif conf >= 86 and chg > 3:
                     action = "🟢 AGGRESSIVE BUY"
                     outlook = "🚀 2-3 Ghante Strong Pump"
                     strong_buy.append(f"**{sym}** → Strong Pump ({conf}%)")
-                elif conf >= 72:
+                elif conf >= 73:
                     action = "🟢 BUY"
-                    outlook = "Good Upside"
+                    outlook = "Good Upside Expected"
                 else:
                     action = "🟡 MONITOR"
-                    outlook = "Sideways"
+                    outlook = "Sideways Accumulation"
                 
                 rows.append({
                     "ASSET": f"🔥 {sym}",
                     "PRICE": f"${price:,.4f}",
                     "24H": f"{chg:+.2f}%",
                     "VOLUME": f"${vol/1e6:.1f}M",
+                    "LIQUIDITY": f"{liq}/100",
                     "CONFIDENCE": f"{conf}%",
-                    "OUTLOOK": outlook,
+                    "2-3H OUTLOOK": outlook,
                     "ACTION": action
                 })
         
         df = pd.DataFrame(rows)
         
-        # ================== TWO MAIN SECTIONS ==================
-        col1, col2 = st.columns(2)
-        
-        with col1:
+        # Top Signals
+        if urgent_sell:
             st.error("### ⚠️ URGENT SELL ALERTS")
-            if urgent_sell:
-                for alert in urgent_sell[:8]:
-                    st.markdown(f"<div class='sell-alert'>{alert}</div>", unsafe_allow_html=True)
-            else:
-                st.success("No Urgent Sell right now")
+            for alert in urgent_sell[:6]:
+                st.markdown(alert)
         
-        with col2:
+        if strong_buy:
             st.success("### 🚀 STRONG BUY SIGNALS")
-            if strong_buy:
-                for signal in strong_buy[:8]:
-                    st.markdown(f"<div class='buy-signal'>{signal}</div>", unsafe_allow_html=True)
-            else:
-                st.info("Waiting for strong momentum...")
+            for signal in strong_buy[:8]:
+                st.markdown(signal)
         
-        # Main Table
-        st.dataframe(df, use_container_width=True, hide_index=True, height=650)
+        # Main Clean Table
+        st.dataframe(
+            df,
+            use_container_width=True,
+            hide_index=True,
+            height=680
+        )
         
-        st.success(f"✅ Updated: {datetime.now().strftime('%H:%M:%S')}")
+        st.success(f"✅ Updated: {datetime.now().strftime('%H:%M:%S')} | Refreshing every 6s")
     
-    time.sleep(7)
+    time.sleep(6)
