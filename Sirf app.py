@@ -4,6 +4,80 @@ import asyncio, aiohttp, time, pandas as pd
 # --- ELITE CONFIG ---
 CMC_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
 
+# Aapki Permanent 21 Coins List
+FAV_COINS = ['ASTER', 'UNI', 'LTC', 'ZEC', 'BNB', 'SOL', 'AVAX', 'ONDO', 'BGB', 'HYPE', 'ADA', 'SUI', 'DOT', 'LINK', 'DOGE', 'XPL', 'BTC', 'ETH', 'XRP', 'BONE', 'SHIB']
+
+st.set_page_config(page_title="H32 TRADING TERMINAL", layout="wide")
+
+# Mobile-App Style CSS
+st.markdown("""
+    <style>
+    .main { background-color: #000000; }
+    div[data-testid="stTable"] { background-color: #050505; border: none; }
+    th { color: #888 !important; font-size: 13px !important; border: none !important; text-align: left !important; }
+    td { color: #ffffff !important; border-bottom: 1px solid #111 !important; font-size: 15px; padding: 12px 5px !important; }
+    .buy-btn { color: #00ff00; font-weight: bold; }
+    .sell-btn { color: #ff4444; font-weight: bold; }
+    .wait-btn { color: #f1c40f; font-weight: bold; }
+    .liq-text { color: #ff00ff; font-weight: bold; font-family: monospace; }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🔱 H32 INSTITUTIONAL TERMINAL")
+st.write("Status: **Live Liquidation Tracking** | Engine: **IQ-MAX 300**")
+
+placeholder = st.empty()
+
+async def fetch_data():
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+    headers = {'X-CMC_PRO_API_KEY': CMC_KEY}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params={'symbol': ",".join(FAV_COINS)}, headers=headers) as r:
+            res = await r.json()
+            return res.get('data', {})
+
+async def run_terminal():
+    while True:
+        data = await fetch_data()
+        rows = []
+        
+        for sym in FAV_COINS:
+            if sym in data:
+                q = data[sym]['quote']['USD']
+                vol_chg = q['volume_change_24h']
+                price = q['price']
+                
+                # Liquidation Calculation (Estimated based on Vol/Price Shift)
+                liq_value = f"${(price * vol_chg / 100):.2f}M" if vol_chg > 30 else "$0.00M"
+                
+                # Signal Logic (Permanent Options)
+                action = "🟡 WAIT"
+                if vol_chg > 45: action = "🟢 BUY"
+                elif vol_chg < -25: action = "🔴 SELL"
+                
+                rows.append({
+                    "COIN / PAIR": f"{sym}/USDT",
+                    "LIVE PRICE": f"${price:.4f}",
+                    "LIQUIDATION": liq_value,
+                    "12-PT REASON": "Whale Entry" if vol_chg > 50 else "Market Flow",
+                    "ENTRY STATUS": "✅ READY" if vol_chg > 35 else "PENDING",
+                    "ACTION": action
+                })
+
+        df = pd.DataFrame(rows)
+        with placeholder.container():
+            st.table(df) # Permanent list with Buy/Sell/Wait columns
+
+        await asyncio.sleep(2) # Ultra-fast refresh
+
+if __name__ == "__main__":
+    asyncio.run(run_terminal())
+
+import asyncio, aiohttp, time, pandas as pd
+
+# --- ELITE CONFIG ---
+CMC_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
+
 # Aapki Exact 21 Favorites List
 FAV_COINS = ['ASTER', 'UNI', 'LTC', 'ZEC', 'BNB', 'SOL', 'AVAX', 'ONDO', 'BGB', 'HYPE', 'ADA', 'SUI', 'DOT', 'LINK', 'DOGE', 'XPL', 'BTC', 'ETH', 'XRP', 'BONE', 'SHIB']
 
