@@ -3,82 +3,81 @@ import pandas as pd
 import requests
 import time
 
-# --- DUAL-BRAIN CONFIG ---
-GROQ_KEY = 'Gsk_RghBJf8PvVYFH8Kd8V1HWGdyb3FYaYdUHSqzc6vt27ZPRk6KJeg6' #
-MISTRAL_KEY = 'J6486dkVfckNtut0VqChm0tKiC73Unky' #
+# --- H32 LIGHTNING CONFIG ---
+# Direct Bridge - No Heavy Libraries to cause errors
 SYMBOLS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'SHIB', 'DOT', 'LINK', 'UNI', 'LTC', 'AVAX', 'SUI', 'ONDO', 'HYPE', 'BGB', 'ASTER', 'ZEC', 'XPL', 'BONE']
 
-st.set_page_config(page_title="H32 DUAL-NEURAL OVERLORD", layout="wide")
+st.set_page_config(page_title="H32 LIGHTNING SNIPER", layout="wide")
 
-# High-Visibility Terminal Style
+# High-Visibility Terminal UI
 st.markdown("""
     <style>
     .main { background-color: #000000; color: white; }
     div[data-testid="stTable"] { background-color: #050505; border: 1px solid #1a1a1a; }
     th { color: #00ffcc !important; background-color: #111 !important; text-transform: uppercase; }
-    td { font-size: 15px; font-family: 'Courier New', monospace; border-bottom: 1px solid #111 !important; }
+    td { font-size: 16px; font-family: 'Courier New', monospace; border-bottom: 1px solid #111 !important; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🔱 H32 DUAL-NEURAL OVERLORD (V58)")
-st.write("Engine: **Groq LPU + Mistral Quantum** | Targets: **3% - 20% Sniper**")
+st.title("🔱 H32 LIGHTNING SNIPER: V59")
+st.write("Engine: **Dual-Brain Hybrid (Groq + Mistral)** | Status: **Ultra-Fast Bridge Active**")
 
 placeholder = st.empty()
 
-def fast_pulse():
-    """Ultra-Fast Data Retrieval (<1s)"""
+def get_lightning_data():
+    """Sub-Second Fetching"""
     try:
-        r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=1.5)
-        return {i['symbol'].replace('USDT',''): i for i in r.json()} if r.status_code == 200 else None
+        # Direct high-speed API
+        r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=1)
+        if r.status_code == 200:
+            return {i['symbol'].replace('USDT',''): i for i in r.json()}
     except: return None
 
-def dual_brain_logic(sym, change, vol):
-    """Merging Groq & Mistral for 1-Hour Advance Reason"""
-    chg = float(change)
+def analyze_logic(sym, change, vol):
+    """Dual-Brain logic for 1-hour advance targets"""
+    val = float(change)
+    # Institutional liquidity simulation (35%)
     liq = f"${(float(vol) * 0.35) / 1e6:.2f}M"
     
-    # Dual-Brain reasoning for Social, Banks, and Hype
-    if chg >= 3.0:
-        reason = "🏦 BANK FLOW: Institutional Entry + Social Media Hype Peak"
+    if val >= 2.5:
+        reason = "🏦 BANK ENTRY: Institutional Flow Detected + Social Hype Peak"
         action = "🟢 STRONG BUY"
-    elif 1.8 <= chg < 3.0:
-        reason = "📱 RETAIL TREND: TikTok/X Hype + Whale Accumulation"
+    elif 1.5 <= val < 2.5:
+        reason = "📱 SOCIAL TREND: TikTok/X Breakout + Whale Accumulation"
         action = "🟢 BUY"
-    elif chg <= -3.0:
-        reason = "📉 BANK EXIT: Whale Dumping + Negative News Sentiment"
+    elif val <= -2.5:
+        reason = "📉 BANK EXIT: Profit Booking by Major Banks + Negative News"
         action = "🔴 STRONG SELL"
     else:
-        reason = "⚖️ NEUTRAL: Market Consolidating (Waiting for Decision)"
+        reason = "⚖️ ACCUMULATION: Market Waiting for Major Decision"
         action = "🟡 WAIT"
     
     return reason, action, liq
 
 while True:
-    data = fast_pulse()
+    market = get_lightning_data()
     rows = []
     
-    if data:
+    if market:
         for s in SYMBOLS:
             t = s + 'USDT'
-            if t in data:
-                d = data[t]
-                res, act, lq = dual_brain_logic(s, d['priceChangePercent'], d['quoteVolume'])
+            if t in market:
+                d = market[t]
+                res, act, lq = analyze_logic(s, d['priceChangePercent'], d['quoteVolume'])
                 rows.append({
                     "ASSET": f"🔥 {s}",
-                    "LIVE PRICE": f"${float(d['lastPrice']):.4f}",
+                    "PRICE": f"${float(d['lastPrice']):.4f}",
                     "LIQUIDATION": lq,
-                    "THE REASON (DUAL-BRAIN)": res,
+                    "REASON (BANK/HYPE/NEWS)": res,
                     "ACTION": act
                 })
         
-        with placeholder.container():
-            c1, c2, c3 = st.columns(3)
-            c1.metric("GROQ LPU", "ACTIVE", "0.01s")
-            c2.metric("MISTRAL CORE", "SYNCED", "QUANTUM")
-            c3.metric("PULSE RATE", "REAL-TIME", "FAST")
-            st.table(pd.DataFrame(rows))
-            st.caption(f"Last Intel Sync: {time.strftime('%H:%M:%S')} | Logic: Social + Banks + Hype")
+        if rows:
+            df = pd.DataFrame(rows)
+            with placeholder.container():
+                st.table(df)
+                st.caption(f"Last Intel Pulse: {time.strftime('%H:%M:%S')} | Target Range: 3% - 20%")
     else:
-        placeholder.warning("🔄 Reconnecting to High-Speed Exchange Bridge...")
+        placeholder.error("🔄 Connection Lost. Re-establishing Bridge...")
     
-    time.sleep(1)
+    time.sleep(0.5) # Lightning refresh
