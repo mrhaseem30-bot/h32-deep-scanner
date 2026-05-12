@@ -3,6 +3,95 @@ import asyncio, aiohttp, time, pandas as pd
 
 # --- ELITE CONFIG ---
 CMC_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
+
+# Aapki Exact 21 Favorites List
+FAV_COINS = ['ASTER', 'UNI', 'LTC', 'ZEC', 'BNB', 'SOL', 'AVAX', 'ONDO', 'BGB', 'HYPE', 'ADA', 'SUI', 'DOT', 'LINK', 'DOGE', 'XPL', 'BTC', 'ETH', 'XRP', 'BONE', 'SHIB']
+
+st.set_page_config(page_title="H32 LIQUIDITY GRID", layout="wide")
+
+# Custom CSS for Mobile-Like List View
+st.markdown("""
+    <style>
+    .main { background-color: #050505; }
+    .stTable { background-color: #000000; border: none; }
+    thead tr th { background-color: #000 !important; color: #888 !important; font-size: 12px; border: none !important; }
+    tbody tr td { border-bottom: 1px solid #1a1a1a !important; font-size: 15px; padding: 15px 5px !important; }
+    .buy-signal { color: #00ff00; font-weight: bold; background: #002200; padding: 5px; border-radius: 3px; }
+    .sell-signal { color: #ff4444; font-weight: bold; background: #220000; padding: 5px; border-radius: 3px; }
+    .price-text { font-family: 'Courier New', monospace; font-weight: bold; }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🔱 H32 INSTITUTIONAL GRID")
+st.write("Scan Mode: **Live Wallet & Liquidity Tracking**")
+
+placeholder = st.empty()
+
+def calculate_grid_logic(q):
+    """Deep analysis for Wallet and Liquidity status"""
+    vol_chg = q['volume_change_24h']
+    h1_chg = q['percent_change_1h']
+    
+    # Wallet Flow Logic
+    if vol_chg > 40:
+        wallet_status = "🟢 WHALE ACCUMULATION"
+        signal = "BUY"
+    elif vol_chg < -20:
+        wallet_status = "🔴 WHALE DISTRIBUTION"
+        signal = "SELL"
+    else:
+        wallet_status = "⚪ RETAIL FLOW"
+        signal = "HOLD"
+    
+    # Reason based on your 12 points
+    reason = "Volume Spike" if vol_chg > 50 else "Trend Follow"
+    if abs(h1_chg) > 1.0: reason = "Liquidation Hunt"
+    
+    return wallet_status, signal, reason
+
+async def fetch_market():
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+    headers = {'X-CMC_PRO_API_KEY': CMC_KEY}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params={'symbol': ",".join(FAV_COINS)}, headers=headers) as r:
+            res = await r.json()
+            return res.get('data', {})
+
+async def grid_engine():
+    while True:
+        data = await fetch_market()
+        rows = []
+        
+        for sym in FAV_COINS:
+            if sym in data:
+                q = data[sym]['quote']['USD']
+                wallet, signal, reason = calculate_grid_logic(q)
+                
+                # Signal Formatting
+                sig_display = f" {signal} "
+                
+                rows.append({
+                    "COIN/VOLUME": f"{sym} / {q['volume_24h'] / 1e6:.1f}M",
+                    "PRICE": f"${q['price']:.4f}",
+                    "1H CHANGE": f"{q['percent_change_1h']:+.2f}%",
+                    "WALLET STATUS": wallet,
+                    "SIGNAL": sig_display,
+                    "REASON (12-PT)": reason
+                })
+
+        df = pd.DataFrame(rows)
+        with placeholder.container():
+            st.table(df) # List view exactly like your app
+
+        await asyncio.sleep(2) # Ultra-fast refresh
+
+if __name__ == "__main__":
+    asyncio.run(grid_engine())
+
+import asyncio, aiohttp, time, pandas as pd
+
+# --- ELITE CONFIG ---
+CMC_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
 GROQ_KEY = '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'
 
 # 21 Elite Coins List from your Favorite Screenshot
