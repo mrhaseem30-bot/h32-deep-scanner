@@ -1,3 +1,6 @@
 streamlit
+pandas
+aiohttp
+
 ​aiohttp
 ​pandas
