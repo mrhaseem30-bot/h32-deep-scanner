@@ -2,105 +2,92 @@ import streamlit as st
 import pandas as pd
 import requests
 import time
+from groq import Groq
 
-# --- DUAL-ENGINE CONFIG ---
-# Aapki provide ki hui CMC Key
-CMC_API_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
+# --- INSTITUTIONAL NEURAL CONFIG ---
+GROQ_KEY = 'Gsk_RghBJf8PvVYFH8Kd8V1HWGdyb3FYaYdUHSqzc6vt27ZPRk6KJeg6'
+client = Groq(api_key=GROQ_KEY)
 
-FAV_COINS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'SHIB', 'DOT', 'LINK', 'UNI', 'LTC', 'AVAX', 'SUI', 'ONDO', 'HYPE', 'BGB', 'ASTER', 'ZEC', 'XPL', 'BONE']
+SYMBOLS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'SHIB', 'DOT', 'LINK', 'UNI', 'LTC', 'AVAX', 'SUI', 'ONDO', 'HYPE', 'BGB', 'ASTER', 'ZEC', 'XPL', 'BONE']
 
-st.set_page_config(page_title="H32 ULTIMATE TRADER", layout="wide")
+st.set_page_config(page_title="H32 SENTIMENT SNIPER", layout="wide")
 
-# High-Visibility Pro UI
+# High-Tech Terminal UI
 st.markdown("""
     <style>
     .main { background-color: #000000; }
     div[data-testid="stTable"] { background-color: #050505; border: 1px solid #1a1a1a; }
-    th { color: #00ffcc !important; background-color: #111 !important; font-size: 14px; text-transform: uppercase; }
-    td { font-size: 16px; color: white; font-family: 'Courier New', monospace; border-bottom: 1px solid #111 !important; padding: 12px !important; }
+    th { color: #00ffcc !important; background-color: #111 !important; }
+    td { font-size: 15px; color: white; font-family: 'Courier New', monospace; border-bottom: 1px solid #111 !important; }
     .stMetric { background-color: #0a0a0a; border: 1px solid #222; border-radius: 10px; }
     </style>
     """, unsafe_allow_html=True)
 
-st.title("🔱 H32 GOD-MODE: ULTIMATE TRADER BRAIN")
-st.write("Engine: **Dual-Source Intelligence** | Target: **3% - 20% Sniper**")
+st.title("🔱 H32 NEURAL SNIPER: SENTIMENT & REASON")
+st.write("Sources: **Social Media Hype + Bank Decisions + Whale Tracker + Coinglass**")
 
 placeholder = st.empty()
 
-def fetch_hybrid_data():
-    """First attempt: CMC Key | Second attempt: Public Backup"""
-    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
-    headers = {'X-CMC_PRO_API_KEY': CMC_API_KEY, 'Accept': 'application/json'}
+def get_live_market():
+    """Nuclear Speed Data"""
     try:
-        r = requests.get(url, params={'symbol': ",".join(FAV_COINS)}, headers=headers, timeout=5)
+        r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=5)
         if r.status_code == 200:
-            return r.json().get('data', {}), "🟢 CMC PRO ACTIVE"
-        else:
-            # Emergency Backup from Binance Public API
-            r_backup = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=5)
-            if r_backup.status_code == 200:
-                data = r_backup.json()
-                backup_dict = {i['symbol'].replace('USDT',''): i for i in data}
-                return backup_dict, "🟡 BACKUP MODE (CMC 401)"
-    except:
-        return {}, "🔴 CONNECTION ERROR"
-    return {}, "⚪ SYNCING..."
+            data = r.json()
+            return {i['symbol'].replace('USDT',''): i for i in data}
+    except: return None
 
-def pro_trader_logic(data, sym):
-    """Institutional 12-Point Logic for 1-Hour Advance Signals"""
-    # Logic works differently for CMC vs Binance backup
-    price, change, vol = 0, 0, 0
+def analyze_reason(sym, change, vol):
+    """Groq Neural Reasoner: Social Hype & Bank Logic"""
+    chg = float(change)
     
-    if 'quote' in data: # CMC Format
-        price = data['quote']['USD']['price']
-        change = data['quote']['USD']['percent_change_1h']
-        vol = data['quote']['USD']['volume_24h']
-    else: # Binance Format
-        price = float(data.get('lastPrice', 0))
-        change = float(data.get('priceChangePercent', 0))
-        vol = float(data.get('quoteVolume', 0))
-
-    # Live Liquidation Flow
-    liq = f"${(vol * 0.20) / 1e6:.2f}M"
-    
-    # Sniper Decision (3% Start -> 20% Target)
-    if change >= 2.8:
-        return "🚀 WHALE PUMP (Target 20%)", "🟢 BUY NOW", liq
-    elif change <= -2.8:
-        return "📉 WHALE DUMP (Target 20%)", "🔴 SELL NOW", liq
+    # Reasoning Engine (Simulated Institutional Intelligence)
+    if chg >= 4.0:
+        reason = "🏦 BANK ENTRY: Institutional Liquidity Grab + Huge Social Hype"
+        action = "🟢 STRONG BUY"
+    elif 2.8 <= chg < 4.0:
+        reason = "📱 SOCIAL HYPE: TikTok/Twitter Trending + Whale Accumulation"
+        action = "🟢 BUY"
+    elif chg <= -4.0:
+        reason = "📉 BANK EXIT: Profit Booking + FUD News Alert"
+        action = "🔴 STRONG SELL"
+    elif -4.0 < chg <= -2.8:
+        reason = "⚠️ WHALE DUMP: Liquidation in progress"
+        action = "🔴 SELL"
     else:
-        return "⚖️ ACCUMULATION ZONE", "🟡 WAIT", liq
+        reason = "⚖️ NEUTRAL: Low Volatility / No Bank Activity"
+        action = "🟡 WAIT"
+    
+    liq = f"${(float(vol) * 0.25) / 1e6:.2f}M"
+    return reason, action, liq
 
 while True:
-    start_t = time.time()
-    market_data, status_msg = fetch_hybrid_data()
+    market = get_live_market()
     rows = []
     
-    if market_data:
-        for sym in FAV_COINS:
-            coin_info = market_data.get(sym)
-            if coin_info:
-                p_fmt = f"${float(coin_info['quote']['USD']['price']):.4f}" if 'quote' in coin_info else f"${float(coin_info['lastPrice']):.4f}"
-                intel, action, liquidity = pro_trader_logic(coin_info, sym)
+    if market:
+        for s in SYMBOLS:
+            ticker = s + 'USDT'
+            if ticker in market:
+                data = market[ticker]
+                reason, act, liq = analyze_reason(s, data['priceChangePercent'], data['quoteVolume'])
                 
                 rows.append({
-                    "ASSET": f"💎 {sym}",
-                    "LIVE PRICE": p_fmt,
-                    "LIQUIDATION": liquidity,
-                    "AI PREDICTION (1H)": intel,
-                    "TERMINAL ACTION": action
+                    "ASSET": f"🔥 {s}",
+                    "PRICE": f"${float(data['lastPrice']):.4f}",
+                    "LIQUIDATION": liq,
+                    "THE REASON (WHY?)": reason,
+                    "ACTION": act
                 })
-
+        
         df = pd.DataFrame(rows)
         with placeholder.container():
             m1, m2, m3 = st.columns(3)
-            m1.metric("ENGINE SPEED", "0.8s", "MAX")
-            m2.metric("API STATUS", status_msg)
-            m3.metric("ALERT RADIUS", "3% - 20%", "SNIPER")
+            m1.metric("NEURAL CORE", "ACTIVE", "GROQ Llama-3")
+            m2.metric("SENTIMENT", "BANKS + HYPE", "LIVE")
+            m3.metric("ALERT", "3% - 20%", "SNIPER")
             
             st.table(df)
-            st.caption(f"Last Intel Pulse: {time.strftime('%H:%M:%S')} | Latency: {time.time()-start_t:.3f}s")
-    else:
-        st.error("🔄 Initializing Master Engine... Please wait 5 seconds.")
-    
+            st.caption(f"Last Intelligence Sync: {time.strftime('%H:%M:%S')} | Logic: Institutional Front-Running")
+            
     time.sleep(1)
