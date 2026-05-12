@@ -7,32 +7,40 @@ import random
 
 st.set_page_config(page_title="H32 QUANTUM TERMINAL", layout="wide", page_icon="🔱")
 
-# ================== CYBER UI ==================
 st.markdown("""
 <style>
     .main {background-color: #000000; color: #00ffcc; font-family: 'Courier New', monospace;}
     th {color: #00ffcc !important; background: #111111; text-transform: uppercase;}
     .positive {color: #00ff88; font-weight: bold;}
     .negative {color: #ff3366; font-weight: bold;}
-    .metric-card {background-color: #111; padding: 15px; border-radius: 10px; border: 1px solid #00ffcc;}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🔱 H32 QUANTUM TERMINAL — V3.0")
-st.caption("⚡ 1.5s Ultra Fast Update • Smart Chain AI • Binance Live")
+st.title("🔱 H32 QUANTUM TERMINAL — V3.1")
+st.caption("⚡ Smart Chain AI • Multiple API Backup • Auto Retry")
 
 SYMBOLS = ['BTC', 'ETH', 'SOL', 'BNB', 'XRP', 'ADA', 'DOGE', 'SHIB', 'DOT', 'LINK', 
            'UNI', 'LTC', 'AVAX', 'SUI', 'ONDO', 'HYPE', 'BGB', 'ASTER', 'ZEC', 'XPL', 'BONE']
 
-@st.cache_data(ttl=1.5)
+# Multiple API sources for reliability
+API_ENDPOINTS = [
+    "https://api.binance.com/api/v3/ticker/24hr",
+    "https://api1.binance.com/api/v3/ticker/24hr",
+    "https://api2.binance.com/api/v3/ticker/24hr",
+    "https://api3.binance.com/api/v3/ticker/24hr"
+]
+
 def fetch_data():
-    try:
-        r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=8)
-        if r.status_code == 200:
-            data = r.json()
-            return {item['symbol'].replace('USDT', ''): item for item in data if item['symbol'].endswith('USDT')}
-    except:
-        return None
+    for url in API_ENDPOINTS:
+        try:
+            r = requests.get(url, timeout=10)
+            if r.status_code == 200:
+                data = r.json()
+                return {item['symbol'].replace('USDT', ''): item 
+                        for item in data if item['symbol'].endswith('USDT')}
+        except:
+            continue
+    return None
 
 def quantum_engine(symbol, chg, qvol, price):
     chg = float(chg)
@@ -40,7 +48,6 @@ def quantum_engine(symbol, chg, qvol, price):
     price = float(price)
     
     liquidity = min(99, int(qvol / 6_000_000))
-    
     prob = 28
     if chg > 3.5: prob += 32
     elif chg > 1.8: prob += 18
@@ -73,6 +80,7 @@ def quantum_engine(symbol, chg, qvol, price):
         "reason": "Strong Momentum + Volume" if chg > 0 else "Whale Distribution"
     }
 
+# Main Loop with better error handling
 placeholder = st.empty()
 
 while True:
@@ -85,7 +93,6 @@ while True:
                 if s in data:
                     d = data[s]
                     intel = quantum_engine(s, d['priceChangePercent'], d['quoteVolume'], d['lastPrice'])
-                    
                     rows.append({
                         "ASSET": f"🔥 {s}",
                         "PRICE": intel['price'],
@@ -101,15 +108,17 @@ while True:
             df = pd.DataFrame(rows)
             
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("BINANCE", "LIVE", "🟢")
-            c2.metric("REFRESH", "1.5s", "⚡")
+            c1.metric("BINANCE", "CONNECTED", "🟢")
+            c2.metric("REFRESH", "2s", "⚡")
             c3.metric("BIAS", "BULLISH", "↑")
-            c4.metric("ENGINE", "V3.0", "ACTIVE")
+            c4.metric("ENGINE", "V3.1", "ACTIVE")
             
             st.dataframe(df, use_container_width=True, hide_index=True, height=680)
             
-            st.caption(f"🕒 Last Updated: {datetime.now().strftime('%H:%M:%S')} | Auto-refreshing every 1.5 seconds")
+            st.success(f"✅ Last Updated: {datetime.now().strftime('%H:%M:%S')}")
+            
         else:
-            st.error("Binance API slow hai... retrying")
+            st.error("🌐 Binance API busy hai... Multiple sources se retry kar raha hoon")
+            st.info("Thoda wait karo, auto-retrying chal raha hai")
     
-    time.sleep(1.5)
+    time.sleep(2)
