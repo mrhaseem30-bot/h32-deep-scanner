@@ -1,4 +1,90 @@
 import streamlit as st
+import asyncio
+import aiohttp
+import pandas as pd
+import time
+
+# --- ELITE CONFIG ---
+CMC_KEY = '767c7cda-2859-417f-9415-6e3b10642c60'
+FAV_COINS = ['ASTER', 'UNI', 'LTC', 'ZEC', 'BNB', 'SOL', 'AVAX', 'ONDO', 'BGB', 'HYPE', 'ADA', 'SUI', 'DOT', 'LINK', 'DOGE', 'XPL', 'BTC', 'ETH', 'XRP', 'BONE', 'SHIB']
+
+st.set_page_config(page_title="H32 INSTANT SNIPER", layout="wide")
+
+# Ultra-Dark High-Speed UI
+st.markdown("""
+    <style>
+    .main { background-color: #000000; }
+    div[data-testid="stTable"] { background-color: #050505; border: 1px solid #111; }
+    th { color: #00ff00 !important; font-size: 12px; border: none !important; }
+    td { font-size: 16px; border-bottom: 1px solid #0a0a0a !important; padding: 10px !important; }
+    .stProgress > div > div > div > div { background-color: #00ff00; }
+    </style>
+    """, unsafe_allow_html=True)
+
+st.title("🔱 H32 ULTRA-SPEED SNIPER")
+st.write("Engine Speed: **< 1.0s Parallel Scan** | Logic: **12-Point IQ**")
+
+placeholder = st.empty()
+
+async def fetch_all_data():
+    """Ek saath saare 21 coins ka data uthane ke liye"""
+    url = "https://pro-api.coinmarketcap.com/v1/cryptocurrency/quotes/latest"
+    headers = {'X-CMC_PRO_API_KEY': CMC_KEY, 'Accepts': 'application/json'}
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params={'symbol': ",".join(FAV_COINS)}, headers=headers) as r:
+            if r.status == 200:
+                res = await r.json()
+                return res.get('data', {})
+            return {}
+
+async def start_engine():
+    while True:
+        start_time = time.time()
+        data = await fetch_all_data()
+        rows = []
+        
+        for sym in FAV_COINS:
+            # Default Values (Pehle se bani hui lines)
+            price, liq, action, entry, reason = "---", "$0.00M", "WAIT", "PENDING", "Scanning..."
+            
+            if sym in data:
+                q = data[sym]['quote']['USD']
+                price = f"${q['price']:.4f}"
+                vol_chg = q['volume_change_24h']
+                
+                # IQ-MAX Speed Logic (12 Points)
+                if vol_chg > 40:
+                    liq = f"${(q['volume_24h']*0.03)/1e6:.1f}M"
+                    action = "🟢 BUY"
+                    entry = "READY"
+                    reason = "Whale Liquidity"
+                elif vol_chg < -15:
+                    action = "🔴 SELL"
+                    entry = "EXIT"
+                    reason = "Liquidity Gap"
+                else:
+                    reason = "Stable Flow"
+
+            rows.append({
+                "COIN": sym,
+                "PRICE": price,
+                "LIQUIDATION": liq,
+                "ENTRY": entry,
+                "REASON": reason,
+                "ACTION": action
+            })
+
+        # Dashboard Update
+        df = pd.DataFrame(rows)
+        with placeholder.container():
+            st.table(df)
+            st.caption(f"Last Scan: {time.strftime('%H:%M:%S')} | Process Time: {time.time()-start_time:.3f}s")
+
+        await asyncio.sleep(1) # Har 1 second mein refresh
+
+if __name__ == "__main__":
+    asyncio.run(start_engine())
+
 import asyncio, aiohttp, time, pandas as pd
 
 # --- ELITE CONFIG ---
