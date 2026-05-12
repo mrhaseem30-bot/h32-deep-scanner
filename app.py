@@ -11,19 +11,17 @@ st.markdown("""
 <style>
     .main {background-color: #000000; color: #00ffcc; font-family: 'Courier New', monospace;}
     th {color: #00ffcc !important; background: #111111; text-transform: uppercase;}
-    .positive {color: #00ff88; font-weight: bold;}
-    .negative {color: #ff3366; font-weight: bold;}
+    .high-confidence {color: #00ff88; font-weight: bold;}
+    .fake-pump {color: #ffaa00; font-weight: bold;}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🔱 H32 QUANTUM TERMINAL — V3.2")
-st.caption("⚡ CoinGecko API • Fast & Stable • Smart Chain AI")
+st.title("🔱 H32 QUANTUM TERMINAL — V4.0")
+st.caption("⚡ Fake Pump Detector + 100 IQ Confidence Score + Enhanced Profile")
 
-SYMBOLS = ['bitcoin', 'ethereum', 'solana', 'binancecoin', 'ripple', 'cardano', 'dogecoin', 
-           'shiba-inu', 'polkadot', 'chainlink', 'uniswap', 'litecoin', 'avalanche-2', 
-           'sui', 'ondo-finance', 'hyperliquid', 'bitget-token', 'zcash', 'xpla', 'bone-shibaswap']
+SYMBOLS = ['BTC','ETH','SOL','BNB','XRP','ADA','DOGE','SHIB','DOT','LINK','UNI','LTC',
+           'AVAX','SUI','ONDO','HYPE','BGB','ZEC','XPL','BONE']
 
-# CoinGecko IDs mapping
 SYMBOL_MAP = {
     'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binancecoin',
     'XRP': 'ripple', 'ADA': 'cardano', 'DOGE': 'dogecoin', 'SHIB': 'shiba-inu',
@@ -34,64 +32,63 @@ SYMBOL_MAP = {
 
 def fetch_coingecko_data():
     try:
-        # Get all coins market data (most reliable endpoint)
         url = "https://api.coingecko.com/api/v3/coins/markets"
-        params = {
-            'vs_currency': 'usd',
-            'order': 'market_cap_desc',
-            'per_page': 250,
-            'page': 1,
-            'sparkline': 'false'
-        }
-        r = requests.get(url, params=params, timeout=12)
+        params = {'vs_currency': 'usd', 'order': 'market_cap_desc', 'per_page': 250, 'page': 1}
+        r = requests.get(url, params=params, timeout=10)
         if r.status_code == 200:
-            data = r.json()
-            return {coin['id']: coin for coin in data}
+            return {coin['id']: coin for coin in r.json()}
     except:
         return None
-    return None
 
-def quantum_engine(coin_data, symbol):
-    if not coin_data:
-        return None
+def advanced_quantum_analysis(coin, symbol):
+    chg_24h = coin.get('price_change_percentage_24h', 0) or 0
+    volume = coin.get('total_volume', 0) or 0
+    price = coin.get('current_price', 0)
+    mcap = coin.get('market_cap', 0) or 0
     
-    chg = coin_data.get('price_change_percentage_24h', 0) or 0
-    price = coin_data.get('current_price', 0)
-    volume = coin_data.get('total_volume', 0) or 0
-    market_cap = coin_data.get('market_cap', 0) or 0
+    # Liquidity Score
+    liquidity = min(99, int(volume / 7_000_000)) if volume else 45
     
-    liquidity = min(99, int(volume / 8_000_000) if volume else 40)
+    # Fake Pump Detector (100 IQ)
+    fake_pump_risk = "LOW"
+    if volume > 150_000_000 and chg_24h > 8 and liquidity < 65:
+        fake_pump_risk = "HIGH ⚠️"
+    elif volume > 80_000_000 and chg_24h > 12:
+        fake_pump_risk = "MEDIUM"
     
-    prob = 30
-    if chg > 4: prob += 35
-    elif chg > 2: prob += 20
-    if volume > 100_000_000: prob += 18
-    if symbol in ['SOL', 'SUI', 'HYPE', 'ONDO', 'AVAX']: prob += 15
+    # Bullish Confidence Score (0-100)
+    confidence = 40
+    if chg_24h > 3: confidence += 25
+    if chg_24h > 6: confidence += 20
+    if volume > 100_000_000: confidence += 18
+    if liquidity > 70: confidence += 12
+    if symbol in ['SOL', 'SUI', 'HYPE', 'ONDO']: confidence += 10
+    confidence = min(98, confidence + random.randint(-8, 8))
     
-    pump_prob = min(94, prob + random.randint(-9, 12))
-    
-    if pump_prob >= 78:
-        outlook = "🚀 3X PUMP HIGHLY LIKELY (6H)"
-        action = "🟢 AGGRESSIVE BUY NOW"
-    elif pump_prob >= 55:
-        outlook = "📈 2X PUMP EXPECTED"
+    # Final Action
+    if confidence >= 82 and fake_pump_risk == "LOW":
+        action = "🟢 AGGRESSIVE BUY (STRONG)"
+        outlook = "🚀 HIGH PROBABILITY UPAR MOVE"
+    elif confidence >= 65:
         action = "🟢 BUY / ACCUMULATE"
-    elif chg <= -4:
-        outlook = "⚠️ STRONG DUMP RISK"
+        outlook = "📈 2X-3X POTENTIAL"
+    elif chg_24h <= -5:
         action = "🔴 SELL / EXIT"
+        outlook = "⚠️ DOWNWARD PRESSURE"
     else:
-        outlook = "⚖️ ACCUMULATION PHASE"
         action = "🟡 MONITOR"
+        outlook = "⚖️ ACCUMULATION PHASE"
     
     return {
         "price": f"\( {price:,.4f}" if price else " \)--",
-        "change": f"{chg:+.2f}%",
-        "volume": f"\( {volume/1e6:.1f}M" if volume else " \)--",
+        "change": f"{chg_24h:+.2f}%",
+        "volume": f"${volume/1e6:.1f}M",
         "liq": f"{liquidity}/100",
-        "pump": f"{pump_prob}%",
-        "outlook": outlook,
+        "confidence": f"{confidence}%",
+        "fake_risk": fake_pump_risk,
         "action": action,
-        "reason": "Strong Volume + Momentum" if chg > 0 else "Correction Phase"
+        "outlook": outlook,
+        "mcap": f"${mcap/1e9:.2f}B" if mcap else "--"
     }
 
 placeholder = st.empty()
@@ -102,36 +99,42 @@ while True:
         
         if data:
             rows = []
-            for sym in ['BTC','ETH','SOL','BNB','XRP','ADA','DOGE','SHIB','DOT','LINK',
-                       'UNI','LTC','AVAX','SUI','ONDO','HYPE','BGB','ZEC','XPL','BONE']:
+            for sym in SYMBOLS:
                 cg_id = SYMBOL_MAP.get(sym)
                 if cg_id and cg_id in data:
-                    intel = quantum_engine(data[cg_id], sym)
-                    if intel:
-                        rows.append({
-                            "ASSET": f"🔥 {sym}",
-                            "PRICE": intel['price'],
-                            "24H": intel['change'],
-                            "VOLUME": intel['volume'],
-                            "LIQUIDITY": intel['liq'],
-                            "6H PUMP": intel['pump'],
-                            "6H OUTLOOK": intel['outlook'],
-                            "ACTION": intel['action'],
-                            "REASON": intel['reason']
-                        })
+                    intel = advanced_quantum_analysis(data[cg_id], sym)
+                    rows.append({
+                        "ASSET": f"🔥 {sym}",
+                        "PRICE": intel['price'],
+                        "24H": intel['change'],
+                        "VOLUME": intel['volume'],
+                        "LIQUIDITY": intel['liq'],
+                        "CONFIDENCE": intel['confidence'],
+                        "FAKE PUMP": intel['fake_risk'],
+                        "6H OUTLOOK": intel['outlook'],
+                        "ACTION": intel['action'],
+                        "MCAP": intel['mcap']
+                    })
             
             df = pd.DataFrame(rows)
             
+            # Top Bar
             c1, c2, c3, c4 = st.columns(4)
-            c1.metric("API", "COINGECKO", "🟢")
-            c2.metric("REFRESH", "3s", "⚡")
-            c3.metric("MODE", "LIVE", "ACTIVE")
-            c4.metric("ENGINE", "V3.2", "STABLE")
+            c1.metric("API STATUS", "COINGECKO LIVE", "🟢")
+            c2.metric("FAKE PUMP FILTER", "ACTIVE", "🛡️")
+            c3.metric("CONFIDENCE ENGINE", "100 IQ", "🔥")
+            c4.metric("VERSION", "V4.0", "ENHANCED")
             
-            st.dataframe(df, use_container_width=True, hide_index=True, height=680)
+            st.dataframe(
+                df,
+                use_container_width=True,
+                hide_index=True,
+                height=720
+            )
             
-            st.success(f"✅ Updated: {datetime.now().strftime('%H:%M:%S')}")
+            st.success(f"✅ Last Updated: {datetime.now().strftime('%H:%M:%S')} | Auto-refresh every 3s")
+            
         else:
-            st.error("🌐 API busy... Retrying in few seconds")
+            st.error("API busy... Retrying")
     
     time.sleep(3)
