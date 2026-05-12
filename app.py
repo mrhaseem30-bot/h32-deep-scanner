@@ -11,17 +11,23 @@ st.markdown("""
 <style>
     .main {background-color: #000000; color: #00ffcc; font-family: 'Courier New', monospace;}
     th {color: #00ffcc !important; background: #111111; text-transform: uppercase;}
-    .aggressive {background-color: #001a00; color: #00ff88;}
-    .sell {background-color: #2a0000; color: #ff3366;}
+    .strong-buy {background-color: #001a00; color: #00ff88; font-weight: bold;}
+    .urgent-sell {background-color: #2a0000; color: #ff3366; font-weight: bold;}
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🔱 H32 QUANTUM TERMINAL — V9.0")
-st.caption("⚡ Aggressive + Safe Profile • Urgent Signals • Pro Trader Logic")
+st.title("🔱 H32 QUANTUM TERMINAL — V9.1")
+st.caption("⚡ Pro Trader + Smart Money + AI Logic • High Profit Formula")
 
-tab1, tab2 = st.tabs(["🔥 AGGRESSIVE TRADER", "🛡️ SAFE ACCUMULATOR"])
+tab1, tab2 = st.tabs(["🔥 AGGRESSIVE (High Profit)", "🛡️ SAFE ACCUMULATOR"])
 
-SYMBOL_MAP = { ... }  # Same as before (copy from previous code)
+SYMBOL_MAP = {
+    'BTC': 'bitcoin', 'ETH': 'ethereum', 'SOL': 'solana', 'BNB': 'binancecoin',
+    'XRP': 'ripple', 'ADA': 'cardano', 'DOGE': 'dogecoin', 'SHIB': 'shiba-inu',
+    'DOT': 'polkadot', 'LINK': 'chainlink', 'UNI': 'uniswap', 'LTC': 'litecoin',
+    'AVAX': 'avalanche-2', 'SUI': 'sui', 'ONDO': 'ondo-finance', 'HYPE': 'hyperliquid',
+    'BGB': 'bitget-token', 'ZEC': 'zcash', 'XPL': 'xpla', 'BONE': 'bone-shibaswap'
+}
 
 def fetch_data():
     try:
@@ -32,31 +38,34 @@ def fetch_data():
         pass
     return None
 
-def pro_trader_logic(chg, vol, liq, symbol):
-    score = 40
-    if chg > 6: score += 35
-    elif chg > 3: score += 20
-    if vol > 250_000_000: score += 30
-    if liq > 80: score += 18
-    if symbol in ['SOL','SUI','HYPE','ONDO']: score += 15
+def smart_money_logic(chg, vol, liq, symbol):
+    score = 45
+    if chg > 5: score += 40
+    elif chg > 2.5: score += 22
+    if vol > 250_000_000: score += 35
+    if liq > 82: score += 20
+    if symbol in ['SOL','SUI','HYPE','ONDO','AVAX']: score += 18
     
-    # Urgent Sell Logic
-    if chg <= -7 or (chg < -4 and vol > 300_000_000):
-        return 92, "🔴 URGENT SELL / EXIT", "HIGH RISK - LONGs Liquidating", "SELL"
+    # Urgent Sell (Distribution)
+    if chg <= -6.5 or (chg < -4 and vol > 400_000_000):
+        return 95, "🔴 URGENT SELL / EXIT NOW", "Distribution Started", "SELL"
     
-    confidence = min(97, score + random.randint(-12, 8))
+    confidence = min(97, score + random.randint(-10, 10))
     
     if confidence >= 88:
-        pred = "🚀 2-3 Ghante Strong Upar"
+        pred = "🚀 2-3 Ghante Strong Pump"
         action = "🟢 AGGRESSIVE BUY"
-    elif confidence >= 72:
-        pred = "📈 1.8X - 2.5X Possible"
+        risk = "HIGH REWARD"
+    elif confidence >= 75:
+        pred = "📈 1.8X - 2.5X Expected"
         action = "🟢 BUY"
+        risk = "Good"
     else:
-        pred = "Sideways / Monitor"
-        action = "🟡 WAIT"
+        pred = "Sideways / Wait"
+        action = "🟡 MONITOR"
+        risk = "Low"
     
-    return confidence, pred, "Moderate", action
+    return confidence, pred, risk, action
 
 placeholder = st.empty()
 
@@ -66,8 +75,8 @@ while True:
         
         if data:
             rows = []
-            urgent_sell = []
-            strong_buy = []
+            urgent = []
+            strong = []
             
             for sym in SYMBOL_MAP.keys():
                 if sym in data:
@@ -76,49 +85,47 @@ while True:
                     vol = float(d['quoteVolume'])
                     price = float(d['lastPrice'])
                     
-                    liq = min(98, int(vol / 7_500_000))
-                    conf, pred, risk, action = pro_trader_logic(chg, vol, liq, sym)
+                    liq = min(98, int(vol / 7500000))
+                    conf, pred, risk, action = smart_money_logic(chg, vol, liq, sym)
                     
                     rows.append({
                         "ASSET": f"🔥 {sym}",
                         "PRICE": f"${price:,.4f}",
                         "24H": f"{chg:+.2f}%",
                         "VOLUME": f"${vol/1e6:.1f}M",
-                        "LIQ": f"{liq}/100",
+                        "LIQUIDITY": f"{liq}/100",
                         "CONFIDENCE": f"{conf}%",
-                        "2-3H PREDICTION": pred,
+                        "2-3H OUTLOOK": pred,
                         "ACTION": action,
-                        "RISK": risk
+                        "RISK/REWARD": risk
                     })
                     
                     if "URGENT SELL" in action:
-                        urgent_sell.append(f"**{sym}** → URGENT SELL ({chg:+.1f}%)")
+                        urgent.append(f"**{sym}** → {pred}")
                     if conf >= 88:
-                        strong_buy.append(f"**{sym}** → {pred} (Conf {conf}%)")
+                        strong.append(f"**{sym}** → {pred} | {conf}%")
             
             df = pd.DataFrame(rows)
             
-            # AGGRESSIVE TAB
             with tab1:
-                st.success("### 🔥 AGGRESSIVE TRADER MODE (High Risk High Reward)")
-                if urgent_sell:
-                    st.error("### ⚠️ URGENT SELL SIGNALS")
-                    for s in urgent_sell:
+                st.success("### 🔥 AGGRESSIVE TRADER MODE (Jyada Kamai Wala Style)")
+                if urgent:
+                    st.error("### ⚠️ URGENT SELL ALERT")
+                    for u in urgent:
+                        st.markdown(u)
+                if strong:
+                    st.success("### 🚀 HIGH PROFIT OPPORTUNITY")
+                    for s in strong[:6]:
                         st.markdown(s)
-                if strong_buy:
-                    st.success("### 🚀 STRONG BUY SIGNALS")
-                    for s in strong_buy[:6]:
-                        st.markdown(s)
-                st.dataframe(df, use_container_width=True, hide_index=True, height=650)
+                st.dataframe(df, use_container_width=True, hide_index=True, height=680)
             
-            # SAFE TAB
             with tab2:
-                st.info("### 🛡️ SAFE ACCUMULATOR MODE (Low Risk)")
-                safe_df = df[df['CONFIDENCE'].str.replace('%','').astype(int) > 65]
-                st.dataframe(safe_df, use_container_width=True, hide_index=True, height=650)
+                st.info("### 🛡️ SAFE ACCUMULATOR MODE")
+                safe = df[df['CONFIDENCE'].str.replace('%','').astype(int) >= 70]
+                st.dataframe(safe, use_container_width=True, hide_index=True, height=680)
             
             st.success(f"✅ Updated: {datetime.now().strftime('%H:%M:%S')} | Refresh 8s")
         else:
-            st.warning("Market data loading...")
+            st.warning("Market data loading... Please wait")
     
     time.sleep(8)
