@@ -1,5 +1,4 @@
 import streamlit as st
-import urllib.parse
 
 # --- 🎭 PREMIUM CLEAN CONVERSATION INTERFACE ---
 st.set_page_config(page_title="Aladdin Auto-Bridge", page_icon="🎙️", layout="centered")
@@ -18,30 +17,25 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🏛️ ALADDIN AUTO-PILOT VOICE SYSTEM")
-st.subheader("[ Zero-Click Fast Multi-Language Live Loop ]")
+st.subheader("[ Zero-Click / Zero-Lag / Instant Mobile Audio ]")
 st.write("---")
 
-# --- 🧠 AUTOMATIC LANGUAGE DETECTOR ENGINE ---
-st.markdown("### 🌐 Live Input Stream")
+# --- 🌐 LIVE INPUT STREAM ---
 user_input = st.text_input("✍️ SYSTEM DETECTING MODE (Type Urdu or Chinese here directly):", 
-                           "Aap ki baat bilkul theek hai, mein sun raha hoon.")
-
-# Processing language matrix automatically based on characters input
-is_chinese = any('\u4e00' <= char <= '\u9fff' for char in user_input)
+                           value="Aap ki baat bilkul theek hai, mein sun raha hoon.")
 
 if user_input:
-    st.write("⏳ *System Processing Intelligent Speech Flow...*")
+    # Processing language matrix automatically based on characters input
+    is_chinese = any('\u4e00' <= char <= '\u9fff' for char in user_input)
     
     if is_chinese:
-        # If input is Chinese -> Automatically translate to Urdu text & prepare Urdu voice note
         detected_lang = "Chinese Mandarin"
-        target_lang = "ur"
+        target_lang_code = "ur-PK"  # Native Urdu Speech Profile
         translated_text = "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai."
         display_flag = "🇵🇰 URDU VOICE OUTPUT"
     else:
-        # If input is Urdu -> Automatically translate to Chinese text & prepare Chinese voice note
         detected_lang = "Urdu / Hindi"
-        target_lang = "zh"
+        target_lang_code = "zh-CN"  # Native Chinese Mandarin Profile
         translated_text = "您好，我完全理解您的意思。"
         display_flag = "🇨🇳 CHINESE MANDARIN VOICE OUTPUT"
 
@@ -49,15 +43,30 @@ if user_input:
     st.info(f"🔍 AUTOMATICALLY DETECTED: {detected_lang}")
     st.success(f"🎯 {display_flag}: {translated_text}")
 
-    # --- 🔊 HIDDEN FAST AUDIO INJECTOR (NO PLAY BARS) ---
-    encoded_text = urllib.parse.quote(translated_text)
-    tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl={target_lang}&client=tw-ob&q={encoded_text}"
-    
-    # Executing hidden background audio layout to remove the visual timeline player completely
-    audio_renderer_html = f"""
-        <audio autoplay="true" style="display:none;">
-            <source src="{tts_url}" type="audio/mp3">
-        </audio>
+    # --- 🧠 HARDWARE LEVEL INSTANT SPEECH INJECTOR ---
+    # This executes JavaScript directly on your phone's browser, completely bypassing network loading lag
+    js_speech_script = f"""
+        <script>
+        function speak() {{
+            if ('speechSynthesis' in window) {{
+                // Stop any ongoing speech first for clear flow
+                window.speechSynthesis.cancel();
+                
+                var msg = new SpeechSynthesisUtterance("{translated_text}");
+                msg.lang = "{target_lang_code}";
+                msg.pitch = 1.0; 
+                msg.rate = 0.95; // Smooth natural human communication speed
+                
+                window.speechSynthesis.speak(msg);
+            }} else {{
+                console.log("Browser does not support Web Speech API");
+            }}
+        }}
+        // Small delay to ensure browser engine alignment
+        setTimeout(speak, 300);
+        </script>
     """
-    st.components.v1.html(audio_renderer_html, height=0, width=0)
-    st.caption("⚡ Background Instant Wave Active: No manual playback required.")
+    
+    # Injecting the code invisibly 
+    st.components.v1.html(js_speech_script, height=0, width=0)
+    st.caption("⚡ Direct Mobile Audio Synth Active: Zero buffering time.")
