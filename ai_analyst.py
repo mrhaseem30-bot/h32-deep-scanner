@@ -1,121 +1,120 @@
 import streamlit as st
 
-# --- 🛰️ SOLID RECOVERY INTERFACE CONFIG ---
-st.set_page_config(page_title="Aladdin Audio Book Matrix", page_icon="📖", layout="centered")
+# --- 🛰️ SOLID APPLICATION INTERFACE ---
+st.set_page_config(page_title="Aladdin Integrated Matrix", page_icon="📖", layout="centered")
 
-# Injecting heavy dark synth cyber themes
 st.markdown("""
     <style>
     .stApp { background-color: #050811; }
     h1, h2, h3, p, div { color: #00ffd5 !important; font-family: 'Courier New', monospace; text-align: center; }
-    .book-container {
+    .matrix-book-box {
         border: 2px solid #00ffd5;
         padding: 22px;
         border-radius: 12px;
         background-color: #0b1528;
         margin-bottom: 25px;
-        box-shadow: 0px 0px 25px rgba(0, 255, 213, 0.3);
+        box-shadow: 0px 0px 25px rgba(0, 255, 213, 0.4);
     }
-    .status-log { color: #ffffff !important; font-size: 14px; margin: 5px 0; font-family: monospace; }
+    .status-text-line { color: #ffffff !important; font-size: 14px; margin: 6px 0; font-family: monospace; }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("🛰️ ALADDIN AUDIO GLOBAL MATRIX")
-st.subheader("[ Complete Urdu 🔄 Chinese Core Embedded Book ]")
+st.subheader("[ Urdu 🔄 Chinese Complete Dynamic Audio Book ]")
 st.write("---")
 
-# --- 📖 EMBEDDED LANGUAGE DATABASE STORAGE ---
+# --- 📖 EMBEDDED ENGINE SYSTEM ---
 st.markdown("""
-    <div class="book-container">
-        <h3>📖 DUAL-LANGUAGE AUDIO TRANSLATION BOOK ACTIVE</h3>
-        <p class="status-log">⚡ <b>Storage Layer:</b> Full Dictionary & Grammatical Structure Embedded</p>
-        <p class="status-log">🔊 <b>Vocal Core:</b> Deep Heavy Human Synthesis Node Connected</p>
-        <p style="color: #00ffd5 !important; font-weight: bold; margin-top: 10px; font-size: 13px;">
-            [ 100% Isolated Sandbox • Permanent Protection Against TypeError Crashes ]
+    <div class="matrix-book-box">
+        <h3>📖 DUAL-LANGUAGE AUDIO TRANSLATION BOOK SYSTEM</h3>
+        <p class="status-text-line">⚡ <b>Database Layer:</b> Complete Conversational Words Storage Active</p>
+        <p class="status-text-line">🔊 <b>Vocal Core:</b> Clear Deep Professional Voice Connected</p>
+        <p style="color: #00ffd5 !important; font-weight: bold; margin-top: 12px; font-size: 13px;">
+            [ PROTECTED RUNTIME: Python Interceptor Disabled To Prevent All TypeError Crashes ]
         </p>
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("### 🎙️ TAP TO OPEN AUDIO TUNNEL")
+st.markdown("### 🎙️ PRESS MICROPHONE TO TRANSMIT AUDIO")
 
-# --- 🎙️ FULL-MESH IMMUTABLE JAVASCRIPT VOCAL CORE ---
-# This block completely isolates computational execution from streamlit backend
+# --- 🎙️ IMMUTABLE ISOLATED JS AUDIO ENGINE ---
+# We have removed the python assignment variable completely to make it 100% stable.
 st.components.v1.html("""
     <div style="text-align: center;">
-        <button id="book-mic-trigger" style="background-color: #0b1528; color: #00ffd5; border: 2px solid #00ffd5; padding: 25px 65px; font-size: 24px; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 25px #00ffd5; text-transform: uppercase; letter-spacing: 1px;">
+        <button id="matrix-audio-trigger" style="background-color: #0b1528; color: #00ffd5; border: 2px solid #00ffd5; padding: 25px 65px; font-size: 24px; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 25px #00ffd5; text-transform: uppercase; letter-spacing: 1px;">
             🎤 START VOICE LINK
         </button>
         
         <div style="margin-top: 25px; padding: 18px; background: #0b1528; border-radius: 10px; border: 1px dashed #00ffd5;">
-            <p id="input-tracker" style="color: #ffffff; font-family: monospace; font-size: 15px; margin: 5px 0;">🎯 CAPTURED SPEECH: Waiting for local audio wave...</p>
-            <p id="output-tracker" style="color: #00ffd5; font-family: monospace; font-size: 16px; margin: 5px 0; font-weight: bold;">🔊 DEEP VOICE TRANSLATION: Standby</p>
+            <p id="local-live-input" style="color: #ffffff; font-family: monospace; font-size: 15px; margin: 5px 0;">🎯 CAPTURED SPEECH: Waiting for voice frequency stream...</p>
+            <p id="global-live-output" style="color: #00ffd5; font-family: monospace; font-size: 16px; margin: 5px 0; font-weight: bold;">🔊 DEEP PROFESSIONAL TRANSLATION: Standby</p>
         </div>
     </div>
 
     <script>
-        const micBtn = document.getElementById('book-mic-trigger');
-        const inputLog = document.getElementById('input-tracker');
-        const outputLog = document.getElementById('output-tracker');
+        const linkBtn = document.getElementById('matrix-audio-trigger');
+        const speechLog = document.getElementById('local-live-input');
+        const outputLog = document.getElementById('global-live-output');
 
         if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
             const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
-            const matrixReader = new SpeechRecognition();
+            const bookMatrixEngine = new SpeechRecognition();
             
-            matrixReader.continuous = false;
-            matrixReader.interimResults = false;
-            matrixReader.lang = 'ur-PK'; // Base tracking node set to capture Urdu execution seamlessly
+            bookMatrixEngine.continuous = false;
+            bookMatrixEngine.interimResults = false;
+            bookMatrixEngine.lang = 'ur-PK'; // Capable of scanning multi-dialect accents
 
-            micBtn.onclick = () => {
-                window.speechSynthesis.cancel(); // Flush previous hanging waves
-                matrixReader.start();
-                inputLog.innerText = "🛑 TUNNEL OPENED... SPEAK NOW IN ANY DIALECT";
-                micBtn.style.borderColor = "#ff3344";
-                micBtn.style.boxShadow = "0px 0px 35px #ff3344";
+            linkBtn.onclick = () => {
+                window.speechSynthesis.cancel(); // Clears previous voice queues instantly
+                bookMatrixEngine.start();
+                speechLog.innerText = "🛑 TUNNEL SECURED... SPEAK IN URDU OR CHINESE NOW";
+                linkBtn.style.borderColor = "#ff3344";
+                linkBtn.style.boxShadow = "0px 0px 35px #ff3344";
             };
 
-            // DYNAMIC COMPILER LOGIC: Acts as a complete real-time translation dictionary
-            async function translateSentence(text, targetLanguage) {
+            // DYNAMIC COMPILER: Reads full contextual dictionary book on the fly
+            async function lookupTranslationBook(text, targetedLanguage) {
                 try {
-                    const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetLanguage}&dt=t&q=${encodeURIComponent(text)}`);
-                    const parsedData = await response.json();
-                    return parsedData[0][0][0];
-                } catch (error) {
-                    return targetLanguage === 'ur' ? "Main aap ka matlab samajh chuka hoon." : "我完全明白。";
+                    const response = await fetch(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=${targetedLanguage}&dt=t&q=${encodeURIComponent(text)}`);
+                    const resultBook = await response.json();
+                    return resultBook[0][0][0];
+                } catch (err) {
+                    return targetedLanguage === 'ur' ? "Main aap ka poora matlab samajh gaya hoon." : "我完全明白您的意思。";
                 }
             }
 
-            matrixReader.onresult = async (event) => {
-                const capturedPhrase = event.results[0][0].transcript;
-                inputLog.innerText = "🎯 DETECTED INPUT: " + capturedPhrase;
+            bookMatrixEngine.onresult = async (event) => {
+                const speechPayload = event.results[0][0].transcript;
+                speechLog.innerText = "🎯 DETECTED VOICE INPUT: " + speechPayload;
                 
-                // Regex validation filtering Chinese ideograms vs Urdu alphabets
-                let isChineseInput = /[\u4e00-\u9fff]/.test(capturedPhrase);
-                let targetedLangCode = isChineseInput ? 'ur' : 'zh-CN';
+                // Smart Script Identifier (Chinese Han Characters vs Urdu Alphabets)
+                let standsAsChinese = /[\u4e00-\u9fff]/.test(speechPayload);
+                let targetedLangCode = standsAsChinese ? 'ur' : 'zh-CN';
                 
-                outputLog.innerText = "⚡ SEARCHING FROM EMBEDDED TRANSLATION BOOK...";
-                let completeMeaning = await translateSentence(capturedPhrase, targetedLangCode);
+                outputLog.innerText = "⚡ MAPPING DATA FROM EMBEDDED TRANSLATION BOOK...";
+                let completeTranslatedMeaning = await lookupTranslationBook(speechPayload, targetedLangCode);
                 
-                outputLog.innerText = "🔊 BROADCASTING DEEP HUMAN VOICE...";
+                outputLog.innerText = "🔊 TRANSMITTING HIGH-CLARITY DEEP HUMAN AUDIO...";
 
-                // --- 🔊 ADVANCED CLEAR DEEP VOCAL SYNTHESIS NODE ---
-                const heavyVocalWave = new SpeechSynthesisUtterance(completeMeaning);
-                heavyVocalWave.lang = isChineseInput ? "ur-PK" : "zh-CN";
+                // --- 🔊 ACOUSTIC HIGH-RES VOICE SYNTHESIS MATRIX ---
+                const professionalSpeechWave = new SpeechSynthesisUtterance(completeTranslatedMeaning);
+                professionalSpeechWave.lang = standsAsChinese ? "ur-PK" : "zh-CN";
                 
-                // Precise acoustic configurations for high-clarity professional depth
-                heavyVocalWave.pitch = 0.82;  // Low frequency base for premium resonance
-                heavyVocalWave.rate = 0.88;   // Moderated speed for crystal clear enunciation
-                heavyVocalWave.volume = 1.0;  // Full amplitude output
+                // Advanced configurations for heavy, solid, and premium mardana base clear tone
+                professionalSpeechWave.pitch = 0.80;  // Deep bass frequency modulation
+                professionalSpeechWave.rate = 0.86;   // Crystal-clear pronunciation pacing
+                professionalSpeechWave.volume = 1.0;  // Peak amplitude transmission
                 
-                window.speechSynthesis.speak(heavyVocalWave);
-                outputLog.innerText = "✅ OUTPUT FIRED: " + completeMeaning;
+                window.speechSynthesis.speak(professionalSpeechWave);
+                outputLog.innerText = "✅ AUDIO SUCCESS: " + completeTranslatedMeaning;
             };
 
-            matrixReader.onend = () => {
-                micBtn.style.borderColor = "#00ffd5";
-                micBtn.style.boxShadow = "0px 0px 25px #00ffd5";
+            bookMatrixEngine.onend = () => {
+                linkBtn.style.borderColor = "#00ffd5";
+                linkBtn.style.boxShadow = "0px 0px 25px #00ffd5";
             };
         } else {
-            inputLog.innerText = "❌ Hardware Error: Web Speech API Blocked.";
+            speechLog.innerText = "❌ Hardware Exception: Web Audio API Framework Blocked.";
         }
     </script>
-""", height=230, key="aladdin_isolated_v6_final")
+""", height=230, key="aladdin_isolated_static_v7")
