@@ -1,7 +1,8 @@
 import streamlit as st
+import os
 
-# --- 🎭 PREMIUM CLEAN CONVERSATION INTERFACE ---
-st.set_page_config(page_title="Aladdin Auto-Bridge", page_icon="🎙️", layout="centered")
+# --- 🎭 PREMIUM QUANTUM DARK INTERFACE ---
+st.set_page_config(page_title="Aladdin Walkie-Talkie", page_icon="🎙️", layout="centered")
 
 st.markdown("""
     <style>
@@ -16,57 +17,67 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🏛️ ALADDIN AUTO-PILOT VOICE SYSTEM")
-st.subheader("[ Zero-Click / Zero-Lag / Instant Mobile Audio ]")
+st.title("🏛️ ALADDIN INSTANT AUDIO BRIDGE")
+st.subheader("[ Pre-Stored Premium Human Voice Matrix ]")
 st.write("---")
 
-# --- 🌐 LIVE INPUT STREAM ---
-user_input = st.text_input("✍️ SYSTEM DETECTING MODE (Type Urdu or Chinese here directly):", 
+# --- 📥 TWO-WAY PRE-STORED DIALOGUE MAPPING ---
+# Yahan hum saare basic dialogues aur unki files ka database lock kar rahe hain
+dialogue_matrix = {
+    "urdu_nodes": {
+        "Aap ki baat bilkul theek hai, mein sun raha hoon.": {
+            "translation": "您好，我完全理解您的意思。",
+            "file": "voice_assets/chinese_1.mp3" # Pre-recorded high quality Chinese voice
+        },
+        "Shukriya bhai! Aap ki poori madad ki jayegi.": {
+            "translation": "谢谢，非常感谢你的支持。",
+            "file": "voice_assets/chinese_2.mp3"
+        }
+    },
+    "chinese_nodes": {
+        "您好，很高兴与您合作。": {
+            "translation": "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai.",
+            "file": "voice_assets/urdu_1.mp3" # Pre-recorded high quality Urdu voice
+        },
+        "这个价格可以再谈谈吗？": {
+            "translation": "Kya is ke rate thode kam ho sakte hain bhai?",
+            "file": "voice_assets/urdu_2.mp3"
+        }
+    }
+}
+
+# --- 🌐 LIVE TEXT CAPTURE WITH AUTO-DETECTION ---
+user_input = st.text_input("✍️ ENTER TEXT OR DIALOGUE (Auto Matching Active):", 
                            value="Aap ki baat bilkul theek hai, mein sun raha hoon.")
 
 if user_input:
-    # Processing language matrix automatically based on characters input
+    # Character verification to check if input is Chinese or Urdu
     is_chinese = any('\u4e00' <= char <= '\u9fff' for char in user_input)
     
-    if is_chinese:
-        detected_lang = "Chinese Mandarin"
-        target_lang_code = "ur-PK"  # Native Urdu Speech Profile
-        translated_text = "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai."
-        display_flag = "🇵🇰 URDU VOICE OUTPUT"
-    else:
-        detected_lang = "Urdu / Hindi"
-        target_lang_code = "zh-CN"  # Native Chinese Mandarin Profile
-        translated_text = "您好，我完全理解您的意思。"
-        display_flag = "🇨🇳 CHINESE MANDARIN VOICE OUTPUT"
-
-    # Display Metrics cleanly
-    st.info(f"🔍 AUTOMATICALLY DETECTED: {detected_lang}")
-    st.success(f"🎯 {display_flag}: {translated_text}")
-
-    # --- 🧠 HARDWARE LEVEL INSTANT SPEECH INJECTOR ---
-    # This executes JavaScript directly on your phone's browser, completely bypassing network loading lag
-    js_speech_script = f"""
-        <script>
-        function speak() {{
-            if ('speechSynthesis' in window) {{
-                // Stop any ongoing speech first for clear flow
-                window.speechSynthesis.cancel();
-                
-                var msg = new SpeechSynthesisUtterance("{translated_text}");
-                msg.lang = "{target_lang_code}";
-                msg.pitch = 1.0; 
-                msg.rate = 0.95; // Smooth natural human communication speed
-                
-                window.speechSynthesis.speak(msg);
-            }} else {{
-                console.log("Browser does not support Web Speech API");
-            }}
-        }}
-        // Small delay to ensure browser engine alignment
-        setTimeout(speak, 300);
-        </script>
-    """
+    matched_file = None
+    translated_text = ""
     
-    # Injecting the code invisibly 
-    st.components.v1.html(js_speech_script, height=0, width=0)
-    st.caption("⚡ Direct Mobile Audio Synth Active: Zero buffering time.")
+    if is_chinese:
+        st.info("🔍 DETECTED: Chinese Mandarin Node")
+        # Direct key mapping from database
+        if user_input in dialogue_matrix["chinese_nodes"]:
+            translated_text = dialogue_matrix["chinese_nodes"][user_input]["translation"]
+            matched_file = dialogue_matrix["chinese_nodes"][user_input]["file"]
+            st.success(f"🇵🇰 INSTANT URDU TARGET: {translated_text}")
+    else:
+        st.info("🔍 DETECTED: Urdu / Hindi Node")
+        if user_input in dialogue_matrix["urdu_nodes"]:
+            translated_text = dialogue_matrix["urdu_nodes"][user_input]["translation"]
+            matched_file = dialogue_matrix["urdu_nodes"][user_input]["file"]
+            st.success(f"🇨🇳 INSTANT MANDARIN TARGET: {translated_text}")
+
+    # --- 🔊 INSTANT AUDIO FIRING MECHANISM ---
+    if matched_file and os.path.exists(matched_file):
+        with open(matched_file, "rb") as audio_file:
+            audio_bytes = audio_file.read()
+            # Bypassing the visible timeline player to create a direct voice-note experience
+            st.audio(audio_bytes, format="audio/mp3", autoplay=True)
+    elif matched_file:
+        st.warning(f"⚠️ Audio asset active in matrix code but missing in repository folder: '{matched_file}'")
+    else:
+        st.error("❌ Audio mismatch: This specific phrase is not saved in the local voice dictionary yet.")
