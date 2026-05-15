@@ -1,51 +1,51 @@
 import streamlit as st
 import json
 
-# --- 🛰️ SATELLITE CORE CONFIG ---
-st.set_page_config(page_title="Aladdin Telemetry Tunnel", page_icon="📡", layout="centered")
+# --- 🛰️ SYSTEM RECOVERY CONFIG ---
+st.set_page_config(page_title="Aladdin Live Channel", page_icon="📡", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #050811; }
     h1, h2, h3, p, div { color: #00ffd5 !important; font-family: 'Courier New', monospace; text-align: center; }
-    .status-panel {
+    .radar-panel {
         border: 2px solid #00ffd5;
         padding: 20px;
         border-radius: 12px;
         background-color: #0b1528;
-        margin-bottom: 20px;
-        box-shadow: 0px 0px 20px rgba(0, 255, 213, 0.4);
+        margin-bottom: 25px;
+        box-shadow: 0px 0px 20px rgba(0, 255, 213, 0.3);
     }
-    .log-text { color: #ffffff !important; text-align: left !important; font-size: 14px; margin: 8px 0; font-family: monospace; }
+    .status-text { color: #ffffff !important; text-align: left !important; font-size: 14px; margin: 8px 0; font-family: monospace; }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("🛰️ ALADDIN AUDIO LIVE TELEMETRY")
-st.subheader("[ Dynamic Urdu 🔄 Chinese Tunnel • Stable Build ]")
+st.subheader("[ Dynamic Urdu 🔄 Chinese Tunnel • Zero-Crash Build ]")
 st.write("---")
 
-# --- 🧠 SAFE STATE INITIALIZATION ---
-if "last_voice_payload" not in st.session_state:
-    st.session_state.last_voice_payload = None
-if "translated_output" not in st.session_state:
-    st.session_state.translated_output = None
+# --- 🧠 SAFE SESSION MATRIX ---
+if "captured_input" not in st.session_state:
+    st.session_state.captured_input = None
+if "broadcast_output" not in st.session_state:
+    st.session_state.broadcast_output = None
 
-# --- 📡 LIVE TRANSMISSION RADAR PANEL ---
-st.markdown('<div class="status-panel"><h3>📡 LIVE DATA TRANSMISSION RADAR</h3>', unsafe_allow_html=True)
+# --- 📡 LIVE TRANSMISSION RADAR (Awaaz Check Panel) ---
+st.markdown('<div class="radar-panel"><h3>📡 LIVE DATA TRANSMISSION RADAR</h3>', unsafe_allow_html=True)
 
-if st.session_state.last_voice_payload:
-    st.markdown(f'<div class="log-text">🟢 <b>[INPUT CAPTURED]:</b> "{st.session_state.last_voice_payload}"</div>', unsafe_allow_html=True)
-    st.markdown('<div class="log-text">⚡ <b>[SERVER ROUTING]:</b> Data Packets Synchronized to Network Core...</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="log-text">🔊 <b>[GLOBAL BROADCAST]:</b> Professional Sound Dispatched ➡️ <i>"{st.session_state.translated_output}"</i> ✅</div>', unsafe_allow_html=True)
+if st.session_state.captured_input:
+    st.markdown(f'<div class="status-text">🟢 <b>[SIGNAL RECEIVED]:</b> "{st.session_state.captured_input}"</div>', unsafe_allow_html=True)
+    st.markdown('<div class="status-text">⚡ <b>[MATRIX STATUS]:</b> Data Packet Transmitted to Server Network...</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="status-text">🔊 <b>[AUDIO FIRED]:</b> Target Response Sent ➡️ <i>"{st.session_state.broadcast_output}"</i> ✅</div>', unsafe_allow_html=True)
 else:
-    st.markdown('<div class="log-text" style="color: #ff3344 !important; text-align: center !important; font-weight: bold;">• STANDBY: Mic is waiting for voice input stream...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="status-text" style="color: #ff3344 !important; text-align: center !important; font-weight: bold;">• STANDBY: Mic is waiting for voice input stream...</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("### 🎙️ PRESS TO TRANSMIT GLOBAL AUDIO")
 
-# --- 🎙️ JAVASCRIPT AUDIO ENGINE COMPONENT ---
-captured_data = st.components.v1.html("""
+# --- 🎙️ JAVASCRIPT BROADCAST MATRIX ---
+raw_payload = st.components.v1.html("""
     <div style="text-align: center;">
         <button id="radar-mic" style="background-color: #0b1528; color: #00ffd5; border: 2px solid #00ffd5; padding: 25px 55px; font-size: 24px; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 20px #00ffd5; text-transform: uppercase;">
             🎤 START DUAL AUDIO CHANNEL
@@ -89,22 +89,21 @@ captured_data = st.components.v1.html("""
                 let isChinese = /[\u4e00-\u9fff]/.test(speechString);
                 let targetLang = isChinese ? 'ur' : 'zh-CN';
                 
-                telemetry.innerText = "📡 Processing Matrix Meaning...";
                 let outputMeaning = await fetchTranslation(speechString, targetLang);
                 
-                // Professional Audio Output Setup
+                // Professional Human Voice Output Settings
                 const synthWave = new SpeechSynthesisUtterance(outputMeaning);
                 synthWave.lang = isChinese ? "ur-PK" : "zh-CN";
                 synthWave.pitch = 0.85; 
                 synthWave.rate = 0.92;
                 
                 window.speechSynthesis.speak(synthWave);
-                telemetry.innerText = "🔊 Audio Transmission Completed.";
+                telemetry.innerText = "🔊 Broadcast Completed Successfully.";
 
-                // Safely send data back to python
+                // Safely ship structural data payload
                 window.parent.postMessage({
                     type: 'streamlit:setComponentValue',
-                    value: JSON.stringify({ voice_in: speechString, voice_out: outputMeaning })
+                    value: speechString + "|||" + outputMeaning
                 }, '*');
             };
 
@@ -112,20 +111,18 @@ captured_data = st.components.v1.html("""
                 btn.style.borderColor = "#00ffd5";
             };
         } else {
-            telemetry.innerText = "❌ Microphone access denied.";
+            telemetry.innerText = "❌ Microphone device unavailable.";
         }
     </script>
-""", height=160, key="aladdin_matrix_final_v3")
+""", height=160, key="aladdin_matrix_v4_stable")
 
-# --- 📊 CRITICAL BUG FIX: SAFE DATA INTERCEPTOR ---
-if captured_data is not None and captured_data != "":
+# --- 📊 CRITICAL BUG FIX: ZERO-CRASH HYPER-SAFE PARSER ---
+if raw_payload and isinstance(raw_payload, str) and "|||" in raw_payload:
     try:
-        # Strict validation ensuring no raw data format breaks the stream
-        data_packet = json.loads(str(captured_data))
-        if isinstance(data_packet, dict) and "voice_in" in data_packet:
-            st.session_state.last_voice_payload = data_packet["voice_in"]
-            st.session_state.translated_output = data_packet["voice_out"]
+        parts = raw_payload.split("|||")
+        if len(parts) == 2:
+            st.session_state.captured_input = parts[0]
+            st.session_state.broadcast_output = parts[1]
             st.rerun()
-    except Exception as e:
-        # Silently bypass any half-cooked packet data to avoid TypeError screens
+    except Exception:
         pass
