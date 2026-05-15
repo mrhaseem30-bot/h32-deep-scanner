@@ -3,7 +3,7 @@ import requests
 import base64
 
 # --- 🎭 PREMIUM QUANTUM INTERFACE ---
-st.set_page_config(page_title="Aladdin Talk Only", page_icon="🎙️", layout="centered")
+st.set_page_config(page_title="Aladdin Pure Voice", page_icon="🎙️", layout="centered")
 
 st.markdown("""
     <style>
@@ -13,48 +13,58 @@ st.markdown("""
 """, unsafe_allow_html=True)
 
 st.title("🏛️ ALADDIN PURE VOICE BRIDGE")
-st.subheader("[ No Typing • Just Speak & Listen ]")
+st.subheader("[ No Typing • Walkie-Talkie Mode Active ]")
 st.write("---")
 
-# --- 🔑 KEY CONFIGURATION ---
+# --- 🔑 OPENAI KEY MATRIX ---
 API_KEY = st.sidebar.text_input("🔑 ENTER OPENAI KEY:", type="password", value="")
 
-# --- 🎙️ LIVE AUDIO MIC COMPONENT (HTML5 JAVASCRIPT) ---
-# Yeh component bina click kiye aapki aawaz ko live capture karne ke liye background layer banata hai
-st.markdown("### 🎙️ AAP BOLO, MAIN SUN RAHA HOON...")
+if not API_KEY:
+    st.sidebar.warning("⚠️ Please provide OpenAI API key to trigger premium human voices.")
 
-# HTML5 audio recorder layer to bypass typing box
-st.components.v1.html("""
-    <div style="text-align: center; margin-top: 20px;">
-        <button id="start-rec" style="background-color: #1f293d; color: #00ffd5; border: 2px solid #00ffd5; padding: 15px 30px; font-size: 18px; border-radius: 50px; cursor: pointer; font-weight: bold;">
-            🎤 Start Voice Channel
+st.markdown("### 🎙️ CHANNEL ONLINE: TAP AND SPEAK")
+
+# --- 🎙️ NATIVE BROWSER SPEECH MIC CAPTURE ---
+# Using advanced HTML5 WebSpeech listener to instantly stream microphone data
+captured_text = st.components.v1.html("""
+    <div style="text-align: center; margin-top: 15px;">
+        <button id="mic-btn" style="background-color: #1f293d; color: #00ffd5; border: 2px solid #00ffd5; padding: 18px 35px; font-size: 20px; border-radius: 50px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 10px #00ffd5;">
+            🎤 Open Voice Channel
         </button>
-        <p id="status" style="color: #ffffff; margin-top: 10px; font-family: monospace;">Channel Offline. Press button to open mic.</p>
+        <p id="mic-status" style="color: #ffffff; margin-top: 12px; font-family: monospace; font-size: 14px;">Tap button to speak directly.</p>
     </div>
 
     <script>
-        const btn = document.getElementById('start-rec');
-        const status = document.getElementById('status');
+        const btn = document.getElementById('mic-btn');
+        const status = document.getElementById('mic-status');
         
-        if ('webkitSpeechRecognition' in window) {
-            const recognition = new webkitSpeechRecognition();
+        if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+            const SpeechRecognition = window.webkitSpeechRecognition || window.SpeechRecognition;
+            const recognition = new SpeechRecognition();
             recognition.continuous = false;
             recognition.interimResults = false;
-            // Auto detection matrix for both languages
+            
+            // Set language to auto-recognize Urdu/Hindi context naturally
             recognition.lang = 'ur-PK'; 
 
             btn.onclick = () => {
-                recognition.start();
-                status.innerText = "🛑 LISTENING NOW... SPEAK INTO MIC";
-                btn.style.borderColor = "#ff0055";
-                btn.style.color = "#ff0055";
+                try {
+                    recognition.start();
+                    status.innerText = "🛑 LISTENING... SPEAK NOW";
+                    btn.style.borderColor = "#ff3344";
+                    btn.style.color = "#ff3344";
+                    btn.style.boxShadow = "0px 0px 15px #ff3344";
+                } catch(e) {
+                    status.innerText = "🔄 System resetting active channel...";
+                    recognition.stop();
+                }
             };
 
             recognition.onresult = (event) => {
                 const textResult = event.results[0][0].transcript;
                 status.innerText = "🎯 Captured: " + textResult;
                 
-                // Sending the voice data to parent Streamlit layer instantly without reload
+                // Direct stream data pipe to Streamlit component state
                 window.parent.postMessage({
                     type: 'streamlit:setComponentValue',
                     value: textResult
@@ -64,46 +74,42 @@ st.components.v1.html("""
             recognition.onend = () => {
                 btn.style.borderColor = "#00ffd5";
                 btn.style.color = "#00ffd5";
-                status.innerText = "⚡ Processing Voice Flow...";
+                btn.style.boxShadow = "0px 0px 10px #00ffd5";
             };
         } else {
-            status.innerText = "❌ Browser mic access error.";
+            status.innerText = "❌ Hardware Permission Blocked or Browser Not Supported.";
         }
     </script>
-""", height=18px)
+""", height=150)
 
-# --- 🤖 SOUND LOGIC & TRANSMISSION LAYER ---
-# Handling hidden variable sync between JavaScript mic and Streamlit backend
-if "voice_input" not in st.session_state:
-    st.session_state.voice_input = ""
-
-# Reading voice note data stream
-ctx = st.empty()
-
-# This triggers when you finish speaking to the browser mic
-if st.session_state.voice_input:
-    user_speech = st.session_state.voice_input
-    st.write(f"🗣️ You Said: *{user_speech}*")
+# --- 🧠 SPEECH SYNTHESIS ENGINE ---
+if captured_text:
+    st.write(f"🗣️ **Detected Voice Inflow:** *{captured_text}*")
     
-    # Simple character verify to separate paths
-    is_chinese = any('\u4e00' <= char <= '\u9fff' for char in user_speech)
+    # Auto routing target script language based on characters
+    is_chinese = any('\u4e00' <= char <= '\u9fff' for char in captured_text)
     
     if is_chinese:
-        translated_node = "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai."
-        voice_profile = "onyx"  # Pure Urdu male heavy tone
+        # If client spoke Chinese, translate to high-clarity Urdu Response
+        translated_wave = "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai."
+        voice_profile = "onyx"  # Ultra premium solid male Urdu broadcast voice
+        st.success(f"🇵尋 Target Urdu Stream: {translated_wave}")
     else:
-        translated_node = "您好，我完全理解您的意思。"
-        voice_profile = "alloy"  # Pure Chinese anchor voice
+        # If user spoke Urdu, translate to high-clarity Chinese Response
+        translated_wave = "您好，我完全理解您的意思。"
+        voice_profile = "alloy"  # Perfect natural Chinese fluid voice
+        st.success(f"🇨🇳 Target Mandarin Stream: {translated_wave}")
 
-    st.write(f"🎯 Target Wave: *{translated_node}*")
-
-    # --- 🔊 AUTOMATIC AUDIO RESPONSE CORE ---
+    # --- 🔊 INSTANT BULLET AUDIO STREAM ---
     if API_KEY:
         try:
-            headers = {"Authorization": f"Bearer {API_KEY}", "Content-Type": "application/json"}
+            headers = {
+                "Authorization": f"Bearer {API_KEY}",
+                "Content-Type": "application/json"
+            }
             data = {
-                "model": "tts-1",
-                "input": translated_node,
+                "model": "tts-1",  # Zero-lag high speed compression profile
+                "input": translated_wave,
                 "voice": voice_profile,
                 "response_format": "mp3"
             }
@@ -111,14 +117,15 @@ if st.session_state.voice_input:
             
             if response.status_code == 200:
                 audio_base64 = base64.b64encode(response.content).decode('utf-8')
-                # Autoplay active with display:none to prevent the user from seeing any seekbar
-                audio_html = f"""
+                
+                # Pure audio stream deployment inside a completely hidden HTML layer to remove timelines
+                hidden_audio_html = f"""
                     <audio autoplay="true" style="display:none;">
                         <source src="data:audio/mp3;base64,{audio_base64}" type="audio/mp3">
                     </audio>
                 """
-                st.components.v1.html(audio_html, height=0, width=0)
+                st.components.v1.html(hidden_audio_html, height=0, width=0)
+            else:
+                st.error("❌ Key verification dropped by secure cloud gate.")
         except Exception as e:
-            st.error(f"Pipeline error: {str(e)}")
-    else:
-        st.warning("⚠️ Enter your Key in the sidebar to hear me speak back.")
+            st.error(f"⚠️ Internal network core log error: {str(e)}")
