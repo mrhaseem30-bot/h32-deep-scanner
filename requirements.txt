@@ -1,13 +1,3 @@
-streamlit
-ccxt
-pandas
-pandas_ta
-plotly
-groq
-mistralai
-google-generativeai
-python-dotenv
-gTTS
-playsound
-numpy
-ta
+streamlit>=1.30.0
+openai>=1.0.0
+elevenlabs==0.2.27
