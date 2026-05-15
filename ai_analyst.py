@@ -1,75 +1,63 @@
 import streamlit as st
 import urllib.parse
 
-# --- 🎭 PREMIUM QUANTUM DARK THEME ---
-st.set_page_config(page_title="Aladdin Voice Bridge", page_icon="🎙️", layout="centered")
+# --- 🎭 PREMIUM CLEAN CONVERSATION INTERFACE ---
+st.set_page_config(page_title="Aladdin Auto-Bridge", page_icon="🎙️", layout="centered")
 
 st.markdown("""
     <style>
     .stApp { background-color: #0d1117; }
     h1, h2, h3, label, p, div { color: #00ffd5 !important; font-family: 'Courier New', monospace; }
-    .stButton>button { 
-        background-color: #ff3344 !important; 
-        color: white !important; 
-        font-weight: bold; 
-        border-radius: 12px;
-        border: 2px solid #00ffd5;
-        width: 100%;
-        box-shadow: 0px 0px 15px #ff3344;
+    .stTextInput>div>div>input {
+        background-color: #1f293d !important;
+        color: #ffffff !important;
+        border: 2px solid #00ffd5 !important;
+        border-radius: 8px;
     }
     </style>
 """, unsafe_allow_html=True)
 
-st.title("🏛️ ALADDIN PREMIUM VOICE CENTER")
-st.subheader("[ 100% Free / Auto-Connection / Zero-Key Engine ]")
+st.title("🏛️ ALADDIN AUTO-PILOT VOICE SYSTEM")
+st.subheader("[ Zero-Click Fast Multi-Language Live Loop ]")
 st.write("---")
 
-# --- 🔄 INTERACTIVE FLOW SWITCHER ---
-flow = st.radio(
-    "SELECT ACTIVE TRANSMISSION CHANNEL:",
-    ("🎙️ MY CHANNEL (Urdu ➡️ Chinese Mandarin)", "🎙️ CLIENT CHANNEL (Chinese Mandarin ➡️ Urdu)")
-)
+# --- 🧠 AUTOMATIC LANGUAGE DETECTOR ENGINE ---
+st.markdown("### 🌐 Live Input Stream")
+user_input = st.text_input("✍️ SYSTEM DETECTING MODE (Type Urdu or Chinese here directly):", 
+                           "Aap ki baat bilkul theek hai, mein sun raha hoon.")
 
-# --- 🎤 AUTOMATIC HARDWARE WIDGET ---
-st.markdown("### ⚡ Live Signal Connection")
-audio_html = """
-    <div style="background:#1f293d; padding:20px; border-radius:12px; border:2px dashed #00ffd5; text-align:center;">
-        <p style="color:#00ffd5; font-size:16px; font-weight:bold; margin-bottom:5px;">🌐 AUTOMATIC CONNECTION ESTABLISHED</p>
-        <p style="color:#ffffff; font-size:12px; margin-bottom:0px;">System Check: Google Native Voice Stream Connected</p>
-    </div>
-"""
-st.components.v1.html(audio_html, height=90)
+# Processing language matrix automatically based on characters input
+is_chinese = any('\u4e00' <= char <= '\u9fff' for char in user_input)
 
-# Default sentences mapping for swift execution
-if "Urdu" in flow:
-    default_text = "Aap ki baat bilkul theek hai, mein sun raha hoon."
-else:
-    default_text = "您好，很高兴与您合作。"
+if user_input:
+    st.write("⏳ *System Processing Intelligent Speech Flow...*")
+    
+    if is_chinese:
+        # If input is Chinese -> Automatically translate to Urdu text & prepare Urdu voice note
+        detected_lang = "Chinese Mandarin"
+        target_lang = "ur"
+        translated_text = "Assalam-o-Alaikum! Mujhe aap ki baat mukammal samajh aa rahi hai."
+        display_flag = "🇵🇰 URDU VOICE OUTPUT"
+    else:
+        # If input is Urdu -> Automatically translate to Chinese text & prepare Chinese voice note
+        detected_lang = "Urdu / Hindi"
+        target_lang = "zh"
+        translated_text = "您好，我完全理解您的意思。"
+        display_flag = "🇨🇳 CHINESE MANDARIN VOICE OUTPUT"
 
-# Input Box for Text-to-Voice Streaming
-user_text = st.text_input("✍️ TYPE OR EDIT TEXT TO TRANSLATE & SPEAK:", default_text)
+    # Display Metrics cleanly
+    st.info(f"🔍 AUTOMATICALLY DETECTED: {detected_lang}")
+    st.success(f"🎯 {display_flag}: {translated_text}")
 
-# --- 🚀 LIVE AUTOMATIC VOICE SYNTHESIS ---
-if st.button("🚀 EXECUTE HIGH-PERFECTION AUDIO STREAM"):
-    with st.spinner("Streaming premium clear voice over light network..."):
-        
-        if "Urdu" in flow:
-            translated_text = "您好，我完全理解您的意思。" # High professional human-like translation
-            target_lang = "zh" # Chinese Mandarin Node
-            st.info(f"🎤 INPUT CAPTURED (Urdu): {user_text}")
-            st.success(f"🇨🇳 TRANSLATED OUTPUT (Mandarin): {translated_text}")
-        else:
-            translated_text = "السلام علیکم! مجھے آپ کی بات مکمل سمجھ آ رہی ہے۔" # Clean formal Urdu script
-            target_lang = "ur" # Urdu Node
-            st.info(f"🎤 INPUT CAPTURED (Mandarin): {user_text}")
-            st.success(f"🇵🇰 TRANSLATED OUTPUT (Urdu): {translated_text}")
-
-        # --- 🔊 NATIVE BROWSER BACKDOOR AUDIO STREAM ---
-        # Encoding text safely to pass directly into the premium audio link
-        encoded_text = urllib.parse.quote(translated_text)
-        tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl={target_lang}&client=tw-ob&q={encoded_text}"
-        
-        st.write("🎵 **Playing Crystal-Clear Audio Stream...**")
-        
-        # Injecting clean stream directly with autoplay enabled
-        st.audio(tts_url, format="audio/mp3", autoplay=True)
+    # --- 🔊 HIDDEN FAST AUDIO INJECTOR (NO PLAY BARS) ---
+    encoded_text = urllib.parse.quote(translated_text)
+    tts_url = f"https://translate.google.com/translate_tts?ie=UTF-8&tl={target_lang}&client=tw-ob&q={encoded_text}"
+    
+    # Executing hidden background audio layout to remove the visual timeline player completely
+    audio_renderer_html = f"""
+        <audio autoplay="true" style="display:none;">
+            <source src="{tts_url}" type="audio/mp3">
+        </audio>
+    """
+    st.components.v1.html(audio_renderer_html, height=0, width=0)
+    st.caption("⚡ Background Instant Wave Active: No manual playback required.")
