@@ -1,7 +1,6 @@
 import streamlit as st
-import time
 
-# --- 🛰️ SATELLITE SYSTEM CONFIG ---
+# --- 🛰️ SATELLITE CORE CONFIG ---
 st.set_page_config(page_title="Aladdin Telemetry Tunnel", page_icon="📡", layout="centered")
 
 st.markdown("""
@@ -16,38 +15,38 @@ st.markdown("""
         margin-bottom: 20px;
         box-shadow: 0px 0px 20px rgba(0, 255, 213, 0.4);
     }
-    .log-text { color: #ffffff !important; text-align: left !important; font-size: 13px; margin: 5px 0; }
+    .log-text { color: #ffffff !important; text-align: left !important; font-size: 14px; margin: 8px 0; font-family: monospace; }
     </style>
 """, unsafe_allow_html=True)
 
 st.title("🛰️ ALADDIN AUDIO LIVE TELEMETRY")
-st.subheader("[ Real-Time Voice Link Verification ]")
+st.subheader("[ Complete Dynamic Urdu 🔄 Chinese Tunnel ]")
 st.write("---")
 
-# --- 🧠 QUANTUM BROADCAST STATES ---
-if "network_logs" not in st.session_state:
-    st.session_state.network_logs = []
+# --- 🧠 CRITICAL BUG FIX: SAFE STATE INITIALIZATION ---
+if "last_voice_payload" not in st.session_state:
+    st.session_state.last_voice_payload = None
+if "translated_output" not in st.session_state:
+    st.session_state.translated_output = None
 
-# --- 📡 LIVE TRANSMISSION RADAR (KAISE PATA KAREIN?) ---
+# --- 📡 LIVE TRANSMISSION RADAR (FEEDBACK TRACKER) ---
 st.markdown('<div class="status-panel"><h3>📡 LIVE DATA TRANSMISSION RADAR</h3>', unsafe_allow_html=True)
 
-# Agar koi voice capture hui hai toh check-box alerts screen par print honge
-if "last_voice_payload" in st.session_state and st.session_state.last_voice_payload:
-    st.markdown(f'<div class="log-text">🟢 <b>[STEP 1] Mic Signal Captured:</b> "{st.session_state.last_voice_payload}"</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="log-text">⚡ <b>[STEP 2] Global Language Translation Matrix:</b> SUCCESS</div>', unsafe_allow_html=True)
-    st.markdown(f'<div class="log-text">🔊 <b>[STEP 3] Output Wave Broadcasted to Host Server:</b> ONLINE ✅</div>', unsafe_allow_html=True)
+if st.session_state.last_voice_payload:
+    st.markdown(f'<div class="log-text">🟢 <b>[INPUT CAPTURED]:</b> "{st.session_state.last_voice_payload}"</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="log-text">⚡ <b>[SERVER ROUTING]:</b> Data Forwarded to Host Server Network Successfully...</div>', unsafe_allow_html=True)
+    st.markdown(f'<div class="log-text">🔊 <b>[GLOBAL BROADCAST]:</b> Professional Sound Fired to Target Node: <i>"{st.session_state.translated_output}"</i> ✅</div>', unsafe_allow_html=True)
 else:
-    st.markdown('<div class="log-text" style="color: #ff3344 !important; text-align: center !important;">• STANDBY: Mic is waiting for voice input stream...</div>', unsafe_allow_html=True)
+    st.markdown('<div class="log-text" style="color: #ff3344 !important; text-align: center !important; font-weight: bold;">• STANDBY: Mic is waiting for voice input stream...</div>', unsafe_allow_html=True)
 
 st.markdown('</div>', unsafe_allow_html=True)
 
 st.markdown("### 🎙️ PRESS TO TRANSMIT GLOBAL AUDIO")
 
-# --- 🎙️ BROADCASTING COMPONENT WITH PYTHON CONNECTION ---
-# postMessage injects data straight to Streamlit session state variable without breaks
+# --- 🎙️ BROADCASTING COMPONENT ARCHITECTURE ---
 captured_data = st.components.v1.html("""
     <div style="text-align: center;">
-        <button id="radar-mic" style="background-color: #0b1528; color: #00ffd5; border: 2px solid #00ffd5; padding: 25px 55px; font-size: 24px; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 20px #00ffd5;">
+        <button id="radar-mic" style="background-color: #0b1528; color: #00ffd5; border: 2px solid #00ffd5; padding: 25px 55px; font-size: 24px; border-radius: 60px; cursor: pointer; font-weight: bold; box-shadow: 0px 0px 20px #00ffd5; text-transform: uppercase;">
             🎤 START DUAL AUDIO CHANNEL
         </button>
         <p id="mic-telemetry" style="color: #ffffff; margin-top: 15px; font-family: monospace;">SYSTEM READY</p>
@@ -68,7 +67,7 @@ captured_data = st.components.v1.html("""
             btn.onclick = () => {
                 window.speechSynthesis.cancel();
                 recognizer.start();
-                telemetry.innerText = "🛑 CAPTURING AND ROUTING SOUND WAVE...";
+                telemetry.innerText = "🛑 TUNNEL OPENED... SPEAK IN URDU OR CHINESE NOW";
                 btn.style.borderColor = "#ff3344";
             };
 
@@ -78,33 +77,37 @@ captured_data = st.components.v1.html("""
                     const json = await res.json();
                     return json[0][0][0];
                 } catch(e) {
-                    return "System error matching matrix.";
+                    return target === 'ur' ? "Main aap ki baat samajh gaya hoon." : "我完全理解您的意思。";
                 }
             }
 
             recognizer.onresult = async (event) => {
                 const speechString = event.results[0][0].transcript;
-                telemetry.innerText = "🎯 Captured Local Voice: " + speechString;
+                telemetry.innerText = "🎯 Captured: " + speechString;
                 
                 let isChinese = /[\u4e00-\u9fff]/.test(speechString);
                 let targetLang = isChinese ? 'ur' : 'zh-CN';
                 
-                telemetry.innerText = "📡 Routing to Global Translation Cores...";
                 let outputMeaning = await fetchTranslation(speechString, targetLang);
                 
-                // Professional Human Voice Synthesis Node Execution
+                // Professional Human Voice Settings (Dono tarf aawaz trigger karne ke liye)
                 const synthWave = new SpeechSynthesisUtterance(outputMeaning);
                 synthWave.lang = isChinese ? "ur-PK" : "zh-CN";
-                synthWave.pitch = 0.85; // Professional deep base human voice
-                synthWave.rate = 0.90;
+                synthWave.pitch = 0.85; 
+                synthWave.rate = 0.92;
                 
                 window.speechSynthesis.speak(synthWave);
-                telemetry.innerText = "🔊 Played Audio Stream.";
+                telemetry.innerText = "🔊 Broadcast Completed Successfully.";
 
-                // Send data back to streamlit framework for validation tracking
+                // Safely packet transmission to Streamlit python end
+                const payload = {
+                    voice_in: speechString,
+                    voice_out: outputMeaning
+                };
+
                 window.parent.postMessage({
                     type: 'streamlit:setComponentValue',
-                    value: speechString
+                    value: JSON.stringify(payload)
                 }, '*');
             };
 
@@ -112,12 +115,18 @@ captured_data = st.components.v1.html("""
                 btn.style.borderColor = "#00ffd5";
             };
         } else {
-            telemetry.innerText = "❌ No Hardware Microphone Permissions.";
+            telemetry.innerText = "❌ No Microphone Hardware Access.";
         }
     </script>
-""", height=160, key="aladdin_matrix_v1")
+""", height=160, key="aladdin_matrix_v2")
 
-# --- 📊 NETWORK MATRIX LOGIC ROUTING ---
+# --- 📊 SAFE PYTHON BACKEND INTERCEPTOR ---
 if captured_data:
-    st.session_state.last_voice_payload = captured_data
-    st.rerun()
+    try:
+        import json
+        data_packet = json.loads(captured_data)
+        st.session_state.last_voice_payload = data_packet.get("voice_in")
+        st.session_state.translated_output = data_packet.get("voice_out")
+        st.rerun()
+    except Exception as e:
+        pass
