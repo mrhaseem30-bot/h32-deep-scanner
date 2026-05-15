@@ -6,139 +6,166 @@ from openai import OpenAI
 from elevenlabs import generate, save, set_api_key
 
 # --- 🛰️ SYSTEM ENVIRONMENT SETUP ---
-st.set_page_config(page_title="ALADDIN CHINESE VOICE V56", layout="wide")
-
-if "counter" not in st.session_state:
-    st.session_state.counter = 0
-st.session_state.counter += 1
+st.set_page_config(page_title="ALADDIN DUAL VOICE BRIDGE V58", layout="wide")
 
 # --- 🎨 STUDIO DARK INTERFACE STYLING ---
 st.markdown("""
     <style>
-    .stApp { background: linear-gradient(135deg, #020610, #070f24) !important; }
+    .stApp { background: linear-gradient(135deg, #020610, #061129) !important; }
     .main { color: #f0f6fc; font-family: 'Inter', sans-serif; }
     
     .studio-box {
         background: radial-gradient(circle at center, #0b1a3a, #030814);
-        border: 2px solid #ff3333;
+        border: 2px solid #00ffcc;
         border-radius: 15px;
         padding: 25px;
         text-align: center;
         margin-bottom: 25px;
-        box-shadow: 0 0 20px rgba(255, 51, 51, 0.2);
+        box-shadow: 0 0 20px rgba(0, 255, 204, 0.2);
+    }
+    
+    .direction-card {
+        background: linear-gradient(145deg, #0d1b2a, #08111f);
+        border: 1px solid #00ffcc;
+        border-radius: 12px;
+        padding: 20px;
+        margin-bottom: 20px;
     }
     
     .text-card {
         background-color: #0d1117;
         border: 1px solid #21262d;
         border-radius: 10px;
-        padding: 18px;
-        min-height: 120px;
+        padding: 15px;
+        min-height: 100px;
     }
     </style>
 """, unsafe_allow_html=True)
 
 # --- 📂 CONTROL SIDEBAR (KEYS DESK) ---
-st.sidebar.markdown("### 🏛️ CHINESE STUDIO KEY CONTROL")
-st.sidebar.markdown("OpenAI aur ElevenLabs dono ki keys lagayein:")
-
+st.sidebar.markdown("### 🏛️ STUDIO CREDENTIALS CONTROL")
 openai_key = st.sidebar.text_input("🔑 OPENAI API KEY", type="password", placeholder="sk-...")
 elevenlabs_key = st.sidebar.text_input("🔑 ELEVENLABS API KEY", type="password", placeholder="Paste ElevenLabs Key...")
 
 st.sidebar.markdown("---")
-st.sidebar.markdown("### 🗣️ CHINESE AI VOICE CHARACTER")
-# ElevenLabs ke multilingual v2 model ke sath yeh voices Chinese top-class bolti hain
-voice_character = st.sidebar.selectbox("🎙️ SELECT CHINESE VOICE STYLE", ["Zhiyu (Professional Native Mandarin - Recommended)", "Marcus (Smooth Accent)", "Bella (Clear Female Anchor)"])
+st.sidebar.markdown("### 🗣️ HIGH-PERFECTION VOICE MODELS")
+chinese_voice = st.sidebar.selectbox("🇨🇳 CHINESE VOICE CHARATER", ["Zhiyu (Native Mandarin)", "Bella (Studio Anchor)"])
+urdu_voice = st.sidebar.selectbox("🇵🇰 URDU VOICE CHARACTER", ["Marcus (Deep Professional Urdu Accent)", "Adam (Solid Clear Tone)"])
 
 # --- 👁️ MAIN INTERFACE HEADER ---
 st.markdown("""
     <div class='studio-box'>
-        <h2 style='color: #ff3333; margin: 0; font-size: 1.6rem;'>👁️ ALADDIN PURE CHINESE TRANS-VOICE ENGINE V56</h2>
-        <p style='color: #8b949e; margin: 5px 0 0 0;'>Perfect Urdu/Hindi-to-Chinese Audio Translation | Native Mandarin Studio Sound</p>
+        <h2 style='color: #00ffcc; margin: 0; font-size: 1.6rem;'>👁️ ALADDIN TWO-WAY REAL-TIME VOICE BRIDGE</h2>
+        <p style='color: #8b949e; margin: 5px 0 0 0;'>Automatic Translation Intercept | Urdu/Hindi ⇄ Chinese Mandarin (Studio Quality)</p>
     </div>
 """, unsafe_allow_html=True)
 
-st.markdown("### 🎙️ STEP 1: UPLOAD YOUR AUDIO (Urdu / Hindi)")
-uploaded_audio = st.file_uploader("Upload any rough/low-quality recording (.mp3, .wav, .m4a)", type=["mp3", "wav", "m4a"])
+# --- 🔄 DIRECTION SWITCHER ---
+st.markdown("### 🔄 SELECT YOUR CONVERSATION FLOW")
+direction = st.radio(
+    "Choose who is speaking right now:",
+    ["🎙️ I AM SPEAKING (Urdu/Hindi ➡️ Chinese Mandarin)", "🎙️ CHINESE CLIENT IS SPEAKING (Chinese Mandarin ➡️ Urdu)"],
+    horizontal=True
+)
+
+st.write("---")
+
+# --- 📂 AUDIO SOURCE INPUT ---
+uploaded_audio = st.file_uploader("Upload or Record Voice Audio (.mp3, .wav, .m4a)", type=["mp3", "wav", "m4a"])
 
 if uploaded_audio is not None:
     st.audio(uploaded_audio, format='audio/mp3')
     st.write("---")
     
-    if st.button("🚀 EXECUTE PERFECT CHINESE TRANSLATION"):
+    if st.button("🚀 TRANSMIT & TRANSLATE NOW"):
         if not openai_key or not elevenlabs_key:
-            st.error("🚨 Galti! Please check sidebar. OpenAI aur ElevenLabs dono ki API Keys dalna lazmi hai.")
+            st.error("🚨 Galti! Please enter both OpenAI and ElevenLabs keys in the sidebar.")
         else:
-            with st.spinner("⚡ Aladdin Engine is processing... Translating to Mandarin and generating premium voice..."):
+            with st.spinner("⚡ Aladdin Quantum Core is processing voice channels..."):
                 try:
-                    # Save local temp cache file
-                    temp_input_path = "temp_user_voice.mp3"
-                    with open(temp_input_path, "wb") as f:
+                    # Save audio local cache
+                    temp_input = "temp_voice_bridge.mp3"
+                    with open(temp_input, "wb") as f:
                         f.write(uploaded_audio.read())
-                    
-                    # 1. TRANSLATION TO CHINESE (Using GPT-4o-mini to perfectly translate the Urdu text)
+                        
                     openai_client = OpenAI(api_key=openai_key)
-                    
-                    # First get Urdu text from speech
-                    with open(temp_input_path, "rb") as audio_file:
-                        transcription = openai_client.audio.transcriptions.create(
-                            model="whisper-1",
-                            file=audio_file
-                        )
-                    urdu_text = transcription.text
-                    
-                    # Convert that Urdu text into natural Chinese (Mandarin)
-                    translation_data = openai_client.chat.completions.create(
-                        model="gpt-4o-mini",
-                        messages=[
-                            {"role": "system", "content": "You are an expert native Chinese translator. Translate the user's input text into natural, professional Mandarin Chinese text. Only output the translated Chinese characters."},
-                            {"role": "user", "content": urdu_text}
-                        ]
-                    )
-                    perfect_chinese_text = translation_data.choices[0].message.content
-                    
-                    # 2. HIGH-END CHINESE VOICE GENERATION (ElevenLabs Multilingual 1 Number Sound)
                     set_api_key(elevenlabs_key)
                     
-                    # Using eleven_multilingual_v2 model which supports perfect native Chinese pronunciations
+                    # --- 🔴 PATH A: URDU TO CHINESE ---
+                    if "Urdu/Hindi ➡️ Chinese" in direction:
+                        # 1. Capture user Urdu speech
+                        with open(temp_input, "rb") as f_audio:
+                            transcription = openai_client.audio.transcriptions.create(model="whisper-1", file=f_audio)
+                        input_text = transcription.text
+                        
+                        # 2. Perfect translate to Mandarin Text
+                        translation = openai_client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {"role": "system", "content": "You are an elite native Chinese translator. Translate the input text directly into formal, professional Mandarin Chinese characters. Output ONLY the translation."},
+                                {"role": "user", "content": input_text}
+                            ]
+                        )
+                        output_text = translation.choices[0].message.content
+                        selected_model_voice = chinese_voice.split(" ")[0]
+                        success_msg = f"🔥 Successfully Translated into Chinese via `{selected_model_voice}` Studio Voice:"
+                    
+                    # --- 🔵 PATH B: CHINESE TO URDU ---
+                    else:
+                        # 1. Capture Chinese client speech
+                        with open(temp_input, "rb") as f_audio:
+                            transcription = openai_client.audio.transcriptions.create(model="whisper-1", file=f_audio)
+                        input_text = transcription.text
+                        
+                        # 2. Perfect translate to Professional Urdu Text
+                        translation = openai_client.chat.completions.create(
+                            model="gpt-4o-mini",
+                            messages=[
+                                {"role": "system", "content": "You are an elite Urdu linguist. Translate the Chinese text into perfectly natural, highly professional Urdu text. Use clean language, avoid robotic phrases. Output ONLY the translated Urdu text."},
+                                {"role": "user", "content": input_text}
+                            ]
+                        )
+                        output_text = translation.choices[0].message.content
+                        selected_model_voice = urdu_voice.split(" ")[0]
+                        success_msg = f"🔥 Successfully Translated into Professional Urdu via `{selected_model_voice}` Studio Voice:"
+
+                    # 3. HIGH PERFECTION ELEVENLABS SOUND GENERATOR
                     high_quality_audio = generate(
-                        text=perfect_chinese_text,
-                        voice=voice_character.split(" ")[0],
+                        text=output_text,
+                        voice=selected_model_voice,
                         model="eleven_multilingual_v2"
                     )
                     
-                    temp_output_path = "studio_chinese_output.mp3"
-                    save(high_quality_audio, temp_output_path)
+                    temp_output = "studio_bridge_output.mp3"
+                    save(high_quality_audio, temp_output)
                     
-                    # --- 📊 DISPLAY SYSTEM TEXT COMPARISON ---
-                    col_view1, col_view2 = st.columns(2)
-                    with col_view1:
+                    # --- 📊 DISPLAY RESULTS SIDE-BY-SIDE ---
+                    col_in, col_out = st.columns(2)
+                    with col_in:
                         st.markdown(f"""
                             <div class='text-card' style='border-top: 3px solid #ff9b05;'>
-                                <span style='color:#8b949e; font-size:11px;'>ORIGINAL AUDIO RECOGNIZED</span><br>
-                                <p style='font-size:14px; margin-top:8px; color:#ffd699;'><b>{urdu_text}</b></p>
+                                <span style='color:#8b949e; font-size:11px;'>🎤 RECOGNIZED INCOMING AUDIO</span><br>
+                                <p style='font-size:15px; margin-top:8px; color:#ffd699;'><b>{input_text}</b></p>
                             </div>
                         """, unsafe_allow_html=True)
-                        
-                    with col_view2:
+                    with col_out:
                         st.markdown(f"""
-                            <div class='text-card' style='border-top: 3px solid #ff3333;'>
-                                <span style='color:#8b949e; font-size:11px;'>NATIVE CHINESE (MANDARIN) TEXT</span><br>
-                                <p style='font-size:14px; margin-top:8px; color:#ff3333;'><b>{perfect_chinese_text}</b></p>
+                            <div class='text-card' style='border-top: 3px solid #00ffcc;'>
+                                <span style='color:#8b949e; font-size:11px;'>🎯 TRANSLATED COMPOSITOR TARGET</span><br>
+                                <p style='font-size:15px; margin-top:8px; color:#00ffcc;'><b>{output_text}</b></p>
                             </div>
                         """, unsafe_allow_html=True)
                     
                     st.write("---")
-                    st.markdown("### 🔊 STEP 2: PROFESSIONAL CHINESE SOUND OUTPUT")
-                    st.success(f"🔥 Aladdin Audio successfully generated in Chinese using voice `{voice_character.split(' ')[0]}`:")
+                    st.markdown(f"### 🔊 1-NUMBER PERFECT VOICE OUTPUT")
+                    st.success(success_msg)
                     
-                    # Stream the crystal clear audio to user
-                    with open(temp_output_path, "rb") as final_audio:
-                        st.audio(final_audio.read(), format='audio/mp3')
-                    
-                    # Clean cache from local directories
-                    os.remove(temp_input_path)
-                    os.remove(temp_output_path)
+                    with open(temp_output, "rb") as f_final:
+                        st.audio(f_final.read(), format='audio/mp3')
+                        
+                    # Clean system cache files
+                    if os.path.exists(temp_input): os.remove(temp_input)
+                    if os.path.exists(temp_output): os.remove(temp_output)
                     
                 except Exception as e:
-                    st.error(f"Chinese Voice Studio Error: {str(e)}")
+                    st.error(f"Voice Bridge Processing Error: {str(e)}")
